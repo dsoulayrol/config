@@ -1,0 +1,3 @@
+[submodule "awesome/flaw"]
+	path = awesome/flaw
+	url = git://github.com/dsoulayrol/flaw.git
