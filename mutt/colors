@@ -1,0 +1,142 @@
+# -*- muttrc -*-
+#
+# Color settings for mutt.
+#
+# Many of these formulas were stolen from Jeremy Blosser
+# These would be much simpler if colors were additive.
+
+## ----------------------------------------------------------------------------
+##  default colors
+## ----------------------------------------------------------------------------
+
+color normal     white         black
+color hdrdefault green         black
+color quoted	 yellow        black
+color quoted1    green         black
+color quoted2    cyan          black
+color signature  blue          black
+color indicator  white         blue
+color error      brightred     black
+color status	 brightwhite   blue
+color tree	 brightmagenta black
+color tilde	 blue          black
+color attachment magenta       black
+color markers	 brightred     black
+color message    white         black
+color search     brightwhite   magenta
+color bold       brightyellow  black
+
+mono bold      bold
+mono underline underline
+mono indicator reverse
+mono error     bold
+
+## ----------------------------------------------------------------------------
+##  index colors
+## ----------------------------------------------------------------------------
+
+# Standard messages
+color index brightwhite   black   "~N !~T !~F !~p !~P"
+color index brightwhite   black   "~T !~F !~p !~P"
+color index black         red     "~F !~p !~P"
+
+# messages to me
+color index brightyellow  black   "~p  ~N !~T !~F !~P"
+color index yellow        black   "~p !~N !~T !~F !~P"
+color index yellow        cyan    "~p      ~T !~F !~P"
+color index yellow        red     "~p          ~F !~P"
+
+# messages from me
+color index brightgreen   black   "~P  ~N !~T !~F"
+color index green         black   "~P !~N !~T !~F"
+color index green         cyan    "~P      ~T !~F"
+color index green         red     "~P          ~F"
+
+# messages which mention me in the body
+color index yellow        black   "~b \"soulayrol|d_rol\" !~N !~T !~F !~p !~P"
+color index brightyellow  black   "~b \"soulayrol|d_rol\"  ~N !~T !~F !~p !~P"
+color index yellow        cyan    "~b \"soulayrol|d_rol\"      ~T !~F !~p !~P"
+color index yellow        red     "~b \"soulayrol|d_rol\"          ~F !~p !~P"
+
+# messages to root, etc.
+color index cyan          black   "~C \"(root|postmaster|mailer-daemon)@\" !~N !~P !~p"
+color index brightcyan    black   "~C \"(root|postmaster|mailer-daemon)@\"  ~N !~P !~p"
+
+# big messages
+color index magenta       black   "!~N                ~z 102400-"
+color index magenta       cyan    "    ~T !~F !~p !~P ~z 102400-"
+color index brightmagenta black   " ~N                ~z 102400-"
+
+# deleted messages
+color index red           black   "!~N ~D"
+color index brightred     black   " ~N ~D"
+
+# spam messages
+color index white         magenta '~h X-Bogosity:\ Spam'
+color index yellow        magenta '~h X-Bogosity:\ Unsure'
+
+# scoring
+#color   index   cyan black              '~n -0'
+#color   index   green black             '~n 1-9'
+#color   index   white black             '~n 10-19'
+#color   index   brightyellow black      '~n 20-'
+
+## ----------------------------------------------------------------------------
+##  message body colors
+## ----------------------------------------------------------------------------
+
+# Attribution lines
+color body magenta black "\\* [^<]+ <[^>]+> \\[[^]]+\\]:"
+color body magenta black "(^|[^[:alnum:]])on [a-z0-9 ,]+( at [a-z0-9:,. +-]+)? wrote:"
+
+# URLs
+color body brightyellow black "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+
+# email addresses
+color body brightmagenta black "((@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\]),)*@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\]):)?[0-9a-z_.+%$-]+@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\])"
+
+# PGP messages
+color  body            brightyellow    black "^gpg: Good signature .*"
+color  body            white           black "^gpg: "
+color  body            brightwhite     red     "^gpg: BAD signature from.*"
+mono   body            bold                    "^gpg: Good signature"
+mono   body            bold                    "^gpg: BAD signature from.*"
+
+# Various smilies and the like
+color body brightwhite black "<[Gg]>"                            # <g>
+color body brightwhite black "<[Bb][Gg]>"                        # <bg>
+color body brightwhite black " [;:]-*[})>{(<|]"                  # :-) etc...
+
+# *bold*
+color body brightblue  black "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
+mono  body bold                "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
+
+# _underline_
+color body brightblue  black "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
+mono  body underline           "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
+
+# /italic/  (Sometimes gets directory names)
+#color body brightblue  black "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
+#mono  body underline           "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
+
+# Border lines.
+color body blue black "( *[-+=#*~_]){6,}"
+
+
+# Colors for items in the reader
+color header brightgreen  black "^(From|Subject):"
+color header brightcyan   black ^To:
+color header brightcyan   black ^Cc:
+mono  header bold               "^(From|Subject):"
+
+
+# GPG
+#color   body    green black             "^gpg: Good signature from"
+#color   body    brightred black         "^gpg: Bad signature from"
+#color   body    brightred black         "^gpg: BAD signature from"
+#color   body    brightred black         "^gpg: Note: This key has expired!"
+#color   body    brightyellow black      "^gpg: WARNING: This key is not certified with a trusted signature!"
+#color   body    brightyellow black      "^gpg:          There is no indication that the signature belongs to the owner."
+#color   body    brightyellow black      "^gpg: can't handle these multiple signatures"
+#color   body    brightyellow black      "^gpg: signature verification suppressed"
+#color   body    brightyellow black      "^gpg: invalid node with packet of type"

@@ -1,0 +1,109 @@
+##
+## Never underestimate the power of documentation.
+##   http://mutt.org
+##   http://mutt.blackfish.org.uk/
+##
+
+## ----------------------------------------------------------------------------
+##  general
+## ----------------------------------------------------------------------------
+
+# Reduce polling frequency to a sane level
+set mail_check = 60
+
+# And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
+set timeout = 10
+
+# Automatically poll subscribed mailboxes for new mail (new in 1.5.11)
+#set imap_check_subscribed
+
+# Activate all caching capabilities
+set header_cache = "~/.mutt/cache"
+set message_cachedir = "~/.mutt/cache"
+
+# Always generate the From header - the false entries should be remove from here :)
+set use_from = yes
+set envelope_from = yes
+set use_envelope_from = yes
+
+# Rely on abook
+set query_command = 'abook --mutt-query "%s"'
+macro generic,index,pager \ca "<shell-escape>abook<return>" "lancer abook"
+macro index,pager A "<pipe-message>abook --add-email<return>" "ajouter l'expéditeur à abook"
+
+# Use a special instance of emacs to write mails.
+set editor = "emacs -nw --no-splash --no-init-file --load ~/.mutt/emacs"
+
+##
+## Display
+##
+
+# Sort mails by thread
+set sort = threads
+
+# Display download progress every 5K
+set net_inc = 5
+
+##
+## Identities, Aliases, Mailing lists
+##
+set realname = "David Soulayrol"
+
+#set signature = "~/.signature"
+#set signature = "~/bin/gen_signature.sh|"
+
+## ----------------------------------------------------------------------------
+##  headers insertion and weeding
+## ----------------------------------------------------------------------------
+
+my_hdr X-Operating-System: `uname -or`
+my_hdr X-URL: http://dsoulayrol.free.fr
+my_hdr X-The-Answer: 42
+
+ignore          *
+unignore        return-path from: to cc bcc subject resent-by date reply-to
+unignore        authenticated-sender apparently-from
+unignore        x-address x-organisation x-mailing-list
+unignore        mail-followup-to user-agent x-mailer x-newsreader
+unignore        x-spammer x-bogosity x-spam-status
+#unignore       message-id
+
+unhdr_order     *
+hdr_order       X-Mailing-List: Return-Path: Message-ID: \
+                From: Resent-By: Reply-To: X-Organisation: \
+                X-Address: To: Cc: Bcc: \
+                Date: X-Bogosity: Subject:
+
+## ----------------------------------------------------------------------------
+##  color
+## ----------------------------------------------------------------------------
+
+source ~/.mutt/colors
+
+## ----------------------------------------------------------------------------
+##  accounts
+## ----------------------------------------------------------------------------
+
+
+# Known mailing lists
+source ~/.mutt/mls
+
+# Register accounts and mailboxes
+source ~/.mutt/accounts
+
+# Bogofilter integration
+macro index S "<enter-command>unset wait_key\n\
+      <pipe-entry>bogofilter -l -Ns\n\
+      <enter-command>set wait_key\n\
+      <save-message>=spam\n" "Apprendre comme spam et sauvegarder dans junk"
+macro pager S "<enter-command>unset wait_key\n\
+      <pipe-entry>bogofilter -l -Ns\n\
+      <enter-command>set wait_key\n\
+      <save-message>=spam\n" "Apprendre comme spam et sauvegarder dans junk"
+
+macro index H "<enter-command>unset wait_key\n\
+      <pipe-entry>bogofilter -l -Sn\n\
+      <enter-command>set wait_key\n" "Apprendre comme ham et sauvegarder"
+macro pager H "<enter-command>unset wait_key\n\
+      <pipe-entry>bogofilter -l -Sn\n\
+      <enter-command>set wait_key\n" "Apprendre comme ham et sauvegarder"
