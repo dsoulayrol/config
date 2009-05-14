@@ -1,30 +1,36 @@
-# -*- muttrc -*-
-#
-# Color settings for mutt.
-#
-# Many of these formulas were stolen from Jeremy Blosser
-# These would be much simpler if colors were additive.
+##
+## Color settings for mutt.
+##
+## Many of these formulas were stolen from Jeremy Blosser
+## These would be much simpler if colors were additive.
+##
+## default, white, black, green, magenta, blue, cyan, yellow, red
+## (bright...)
 
 ## ----------------------------------------------------------------------------
 ##  default colors
 ## ----------------------------------------------------------------------------
 
-color normal     white         black
-color hdrdefault green         black
-color quoted	 yellow        black
+color normal     white         black     # normal text
+color indicator  brightwhite   blue      # selected message
+color tree	 brightmagenta black     # thread arrows
+color status	 brightwhite   blue      # status line
+color error      brightred     black     # error messages
+color message    white         black     # information messages
+color search     brightwhite   magenta
+
+color hdrdefault green         black     # default header lines
+color quoted	 yellow        black     # quoted text
 color quoted1    green         black
 color quoted2    cyan          black
-color signature  blue          black
-color indicator  white         blue
-color error      brightred     black
-color status	 brightwhite   blue
-color tree	 brightmagenta black
-color tilde	 blue          black
-color attachment magenta       black
-color markers	 brightred     black
-color message    white         black
-color search     brightwhite   magenta
-color bold       brightyellow  black
+color quoted3	 yellow        black
+color quoted4    green         black
+color quoted5    cyan          black
+color bold       brightyellow  black     # bold patterns in body
+color signature  green         black     # signature
+color tilde	 blue          black     # bottom of a message
+color attachment magenta       black     # MIME attachements
+color markers	 yellow        black     # + at the beginning of wrapped lines
 
 mono bold      bold
 mono underline underline
@@ -125,8 +131,8 @@ color body blue black "( *[-+=#*~_]){6,}"
 
 # Colors for items in the reader
 color header brightgreen  black "^(From|Subject):"
-color header brightcyan   black ^To:
-color header brightcyan   black ^Cc:
+#color header brightcyan   black ^To:
+#color header brightcyan   black ^Cc:
 mono  header bold               "^(From|Subject):"
 
 

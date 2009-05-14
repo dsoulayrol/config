@@ -1,12 +1,20 @@
-##
-## Never underestimate the power of documentation.
-##   http://mutt.org
-##   http://mutt.blackfish.org.uk/
-##
+# -*-muttrc-*-
+#
+# Never underestimate the power of documentation.
+#   http://mutt.org
+#   http://mutt.blackfish.org.uk/
+#
 
-## ----------------------------------------------------------------------------
-##  general
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  general
+# ----------------------------------------------------------------------------
+
+# Identity
+set realname = "David Soulayrol"
+
+# Rely on sendmail (or any alternative)
+#set sendmail = "/usr/sbin/sendmail"
+set sendmail="/usr/sbin/sendmail -v -X /tmp/esmtp.log"
 
 # Reduce polling frequency to a sane level
 set mail_check = 60
@@ -15,7 +23,7 @@ set mail_check = 60
 set timeout = 10
 
 # Automatically poll subscribed mailboxes for new mail (new in 1.5.11)
-#set imap_check_subscribed
+set imap_check_subscribed
 
 # Activate all caching capabilities
 set header_cache = "~/.mutt/cache"
@@ -24,37 +32,50 @@ set message_cachedir = "~/.mutt/cache"
 # Always generate the From header - the false entries should be remove from here :)
 set use_from = yes
 set envelope_from = yes
-set use_envelope_from = yes
 
 # Rely on abook
 set query_command = 'abook --mutt-query "%s"'
-macro generic,index,pager \ca "<shell-escape>abook<return>" "lancer abook"
-macro index,pager A "<pipe-message>abook --add-email<return>" "ajouter l'expéditeur à abook"
+macro generic,index,pager \ca \
+  "<shell-escape>abook<return>" \
+  "lancer abook"
+macro index,pager A \
+  "<pipe-message>abook --add-email<return>" \
+  "ajouter l'expéditeur à abook"
 
 # Use a special instance of emacs to write mails.
 set editor = "emacs -nw --no-splash --no-init-file --load ~/.mutt/emacs"
 
-##
-## Display
-##
+# ----------------------------------------------------------------------------
+#  display
+# ----------------------------------------------------------------------------
 
-# Sort mails by thread
+# Sorting
+# (date-received, date-sent, from, mailbox-order, size, subject, threads,
+#  to, score, reverse-*)
+# (sort_aux can be prefixed with "last-" to use last element in thread
+#  instead of first one)
+#
 set sort = threads
+set sort_aux=date
+
+# Sorting in File-Browser
+# (date, alpha, reverse-*)
+#
+set sort_browser = alpha
+
+
+#
+# Sorting of aliases:
+# (alias, address, unsorted)
+#
+set sort_alias=alias
 
 # Display download progress every 5K
 set net_inc = 5
 
-##
-## Identities, Aliases, Mailing lists
-##
-set realname = "David Soulayrol"
-
-#set signature = "~/.signature"
-#set signature = "~/bin/gen_signature.sh|"
-
-## ----------------------------------------------------------------------------
-##  headers insertion and weeding
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  headers insertion and weeding
+# ----------------------------------------------------------------------------
 
 my_hdr X-Operating-System: `uname -or`
 my_hdr X-URL: http://dsoulayrol.free.fr
@@ -69,27 +90,41 @@ unignore        x-spammer x-bogosity x-spam-status
 #unignore       message-id
 
 unhdr_order     *
-hdr_order       X-Mailing-List: Return-Path: Message-ID: \
-                From: Resent-By: Reply-To: X-Organisation: \
+hdr_order       X-Mailing-List: Return-Path: \
+                From: Resent-By: Reply-To: \
                 X-Address: To: Cc: Bcc: \
-                Date: X-Bogosity: Subject:
+                Date: Subject: X-Bogosity:
 
-## ----------------------------------------------------------------------------
-##  color
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  color
+# ----------------------------------------------------------------------------
 
 source ~/.mutt/colors
 
-## ----------------------------------------------------------------------------
-##  accounts
-## ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  cryptography
+# ----------------------------------------------------------------------------
 
+source ~/.mutt/crypto
+
+# ----------------------------------------------------------------------------
+#  accounts
+# ----------------------------------------------------------------------------
+
+# Mailboxes default general setting
+set folder = ~/mail
+set spoolfile = +inbox
+set mbox = +inbox
+set postponed = +drafts
+set record = +sent
 
 # Known mailing lists
 source ~/.mutt/mls
 
-# Register accounts and mailboxes
-source ~/.mutt/accounts
+# Accounts and mailboxes
+# The following line loads all the files present in the accounts subdirectory.
+# It is thus possible to create one file per account.
+source 'cat ~/.mutt/accounts/*|'
 
 # Bogofilter integration
 macro index S "<enter-command>unset wait_key\n\
@@ -107,3 +142,4 @@ macro index H "<enter-command>unset wait_key\n\
 macro pager H "<enter-command>unset wait_key\n\
       <pipe-entry>bogofilter -l -Sn\n\
       <enter-command>set wait_key\n" "Apprendre comme ham et sauvegarder"
+
