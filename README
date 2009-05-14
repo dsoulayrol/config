@@ -1,2 +1,21 @@
 My shared configuration. -- David Soulayrol <david.soulayrol@gmail.com>
 
+1. Awesome
+
+This Awesome configuration relies on flaw
+(http://github.com/dsoulayrol/flaw). Before using the configuration,
+these commands must be entered once:
+
+git submodule init
+git submodule update
+
+A specific version of flaw will be cloned into awesome/flaw. Git only
+tracks this very version, so to let him track the most recent one,
+enter the following commands:
+
+cd awesome/flaw
+git remote update
+git merge origin/master
+
+(See the very good tutorial on
+ http://woss.name/2008/04/09/using-git-submodules-to-track-vendorrails/)
