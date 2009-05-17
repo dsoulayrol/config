@@ -6,7 +6,6 @@ Usage: sync_mail.py [login]
 
 from __future__ import with_statement # This isn't required in Python 2.6
 
-import dbus
 import logging
 import os
 import re
@@ -127,6 +126,9 @@ class MuttConfiguration(object):
 
     def _parse_accounts(self, path):
         for f in os.listdir(path):
+            if f.endswith('~'):
+                self._logger.debug('ignore emacs backup %s' % f)
+                continue
             self._accounts.append(Account(os.path.join(path, f), self._folder))
 
     accounts = property(lambda self: self._accounts)
@@ -220,6 +222,12 @@ class MailHandler(object):
 
         */5 * * * * source ~/.config/dbus_session; ~/bin/sync_mail.py > /tmp/mail.log
         """
+        try:
+            import dbus
+        except ImportError:
+            self._logger.warn('dbus module is not installed')
+            return
+
         if not os.environ.has_key('DBUS_SESSION_BUS_ADDRESS'):
             self._logger.warn('DBus session not available')
             return
@@ -247,7 +255,8 @@ class MailHandler(object):
                 if os.path.isdir(path):
                     snapshot[box] = os.listdir(path)
                 else:
-                    self._logger.warn('%s is not a valid maildir box' % box)
+                    self._logger.warn(
+                        '%s (%s) is not a valid maildir box ' % (box, box.path))
         return snapshot
 
 
