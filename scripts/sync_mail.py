@@ -203,7 +203,7 @@ class Synchroniser(object):
         line = proc.stdout.readline()
         while line != '':
             # TODO: improve reporting
-            self._logger.debug('...' + line[:-1])
+            self._logger.debug('  (isync: ' + line[:-1] + ')')
             m = status_re.match(line)
             if m:
                 current_pair[m.group('side')] = m.group('name')
@@ -275,28 +275,19 @@ class MailHandler(object):
     def sort(self):
         self._logger.info('sorting new mail ...')
 
-        # TODO: should disappear with shutil.move below
-        import shutil
-
         # First take a snapshot of new mails on every mailbox to be
         # sure they will ba handled only once.
         for box, mails in self._snapshot(self._conf.accounts).iteritems():
-            print box, mails
             self._logger.info('sorting %s ...' % box)
             for mail in mails:
                 proc = subprocess.Popen(
                     'procmail',
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 with open(os.path.join(box.path, 'new', mail)) as f:
-                    # TODO: check procmail success.
                     proc.communicate(f.read())
-                    print 'sorted out %s' % mail
-
+                    self._logger.info('sorted %s ...' % mail)
                     try:
-                        shutil.move(os.path.join(box.path, 'new', mail), '/tmp')
-                        #if condition_success_procmail?:
-                        #os.unlink(mail)
-
+                        os.unlink(os.path.join(box.path, 'new', mail))
                     except IOError:
                         # It is possible the message was already
                         # edited through mutt, specially with
