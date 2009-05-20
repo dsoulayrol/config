@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+# sync_mail.py, a script to fetch and store mails.
+# Copyright (C) 2009  David Soulayrol <david.soulayrol@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Usage: sync_mail.py [--user login]
@@ -8,6 +23,8 @@ Usage: sync_mail.py [--user login]
 
 from __future__ import with_statement # This isn't required in Python 2.6
 
+import contextlib
+import errno
 import logging
 import os
 import re
@@ -73,6 +90,11 @@ poll %s with proto POP3
 """
 
 
+class LockError(Exception):
+    """Exception raised on lock failure."""
+    pass
+
+
 def check_connection():
     proc = subprocess.Popen(
         ['ping', '-q', '-c1', 'google.com'],
@@ -89,6 +111,29 @@ def create_logger(name):
     handler.setFormatter(logging.Formatter(pattern))
     logger.addHandler(handler)
     return logger
+
+
+@contextlib.contextmanager
+def flock(path):
+    """A simple filelock implementation, using python context manager.
+
+    Adapted from the nice snippet found on
+    http://code.activestate.com/recipes/576572/
+    """
+    while True:
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_RDWR)
+        except OSError, e:
+            if e.errno != errno.EEXIST:
+                raise
+            else:
+                raise LockError
+        else:
+            break
+    try:
+        yield fd
+    finally:
+        os.unlink(path)
 
 
 class MailBox(object):
@@ -338,6 +383,10 @@ class MailHandler(object):
     """A tool to sort and inspect mailboxes."""
     # TODO: port this class to the mailbox standard API. Will allow to
     #       distinguish unread from unseen mails, and parse mbox.
+
+    # TODO: ensure that already sorted mail do not get
+    #       resorted. Perhaps will it be simple with mailbox
+    #       module. Or use a timestamp.
     def __init__(self, conf):
         self._logger = create_logger(self.__class__.__name__)
         self._conf = conf
@@ -363,7 +412,7 @@ class MailHandler(object):
                             # It is possible the message was already
                             # edited through mutt, specially with
                             # spamassassin which is *very* slow :)
-                            self._logger.warn('could not unlink %s' % mail)
+                            self._logger.warn('could not unlink %s: %s' % (mail, e))
                     else:
                         self._logger.info('requeued %s !' % mail)
 
@@ -432,31 +481,40 @@ class MailHandler(object):
         return snapshot
 
 
-# main
-if __name__ == '__main__':
+# Main functions
+
+def start_sync():
     # if not check_connection():
     #     logger.error('no available connection.')
     #     sys.exit(1)
 
     # Install lock.
-    # TODO
+    try:
+        logger = create_logger(__name__)
 
-    # Read the Mutt configuration to get a single configuration source.
-    mutt_conf = MuttConfiguration()
-    mutt_conf.parse()
+        with flock(os.path.join(os.environ['HOME'], '.sync_mail.lock')):
 
-    # Synchronize IMAP accounts.
-    IMAPSynchroniser(mutt_conf).run()
+            # Read the Mutt configuration to get a single configuration source.
+            mutt_conf = MuttConfiguration()
+            mutt_conf.parse()
 
-    # Fetch distant POP accounts.
-    POPFetcher(mutt_conf).run()
+            # Synchronize IMAP accounts.
+            IMAPSynchroniser(mutt_conf).run()
 
-    # Sort incoming mail
-    mail_handler = MailHandler(mutt_conf)
-    mail_handler.sort()
+            # Fetch distant POP accounts.
+            POPFetcher(mutt_conf).run()
 
-    # Count new mails and notify the user through dbus.
-    mail_handler.notify()
+            # Sort incoming mail
+            mail_handler = MailHandler(mutt_conf)
+            mail_handler.sort()
 
-    # Remove lock.
-    # TODO
+            # Count new mails and notify the user through dbus.
+            mail_handler.notify()
+
+    except OSError, e:
+        logger.error('Lock error: %s' % e)
+    except LockError:
+        logger.error('Another instance is already running.')
+
+if __name__ == '__main__':
+    start_sync()
