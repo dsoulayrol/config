@@ -53,4 +53,5 @@
 (autoload 'nuke-trailing-whitespace "whitespace" nil t)
 
 ;; For mail
-(load-library "post")
+;;(load-library "post")
+(load "~/.config/mutt/post")
