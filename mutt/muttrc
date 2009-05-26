@@ -63,6 +63,10 @@ set sort_aux=date
 #
 set sort_browser = alpha
 
+# Display of different MIME parts using mailcap entries.
+auto_view text/html text/enriched application/x-gunzip\
+          application/postscript image/gif application/x-tar-gz
+alternative_order text/enriched text/plain text application/postscript image/*
 
 #
 # Sorting of aliases:
@@ -127,19 +131,8 @@ source ~/.mutt/mls
 source 'cat ~/.mutt/accounts/*|'
 
 # Bogofilter integration
-macro index S "<enter-command>unset wait_key\n\
-      <pipe-entry>bogofilter -l -Ns\n\
-      <enter-command>set wait_key\n\
-      <save-message>=spam\n" "Apprendre comme spam et sauvegarder dans junk"
-macro pager S "<enter-command>unset wait_key\n\
-      <pipe-entry>bogofilter -l -Ns\n\
-      <enter-command>set wait_key\n\
-      <save-message>=spam\n" "Apprendre comme spam et sauvegarder dans junk"
+macro index H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Apprendre comme ham"
+macro index S "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Ns\n\<enter-command>set wait_key\n\<save-message>=spam\n" "Apprendre comme spam et déplacer le message"
 
-macro index H "<enter-command>unset wait_key\n\
-      <pipe-entry>bogofilter -l -Sn\n\
-      <enter-command>set wait_key\n" "Apprendre comme ham et sauvegarder"
-macro pager H "<enter-command>unset wait_key\n\
-      <pipe-entry>bogofilter -l -Sn\n\
-      <enter-command>set wait_key\n" "Apprendre comme ham et sauvegarder"
-
+macro pager H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Apprendre comme ham"
+macro pager S "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Ns\n\<enter-command>set wait_key\n\<save-message>=spam\n" "Apprendre comme spam et déplacer le message"
