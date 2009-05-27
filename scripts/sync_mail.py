@@ -473,30 +473,48 @@ class MailHandler(object):
 
         */5 * * * * source ~/.config/dbus_session; ~/bin/sync_mail.py > ~/mail.log
         """
+        if not os.environ.has_key('DBUS_SESSION_BUS_ADDRESS'):
+            self._logger.warn('DBus session not available')
+            return
+
         try:
             import dbus
         except ImportError:
             self._logger.warn('dbus module is not installed')
             return
 
-        if not os.environ.has_key('DBUS_SESSION_BUS_ADDRESS'):
-            self._logger.warn('DBus session not available')
-            return
+        bus = dbus.SessionBus()
 
-        sysbus = dbus.SessionBus()
-        obj = sysbus.get_object('org.freedesktop.Notifications',
-                                '/org/freedesktop/Notifications')
-        itf = dbus.Interface(obj, 'org.freedesktop.Notifications')
-
-        message = ''
+        stats = {}
         for box, mails in self._snapshot(self._conf.accounts).iteritems():
-            if len(mails):
-                message += '%d  new messages in %s\n' % (len(mails), box.name)
+            stats[box.name] = [len(mails), 0, 0]
 
-        if len(message):
-            itf.Notify(
-                'sync_mail.py', 0, '', 'New Mail!', message, [], {}, -1)
-            self._logger.info('notification sent to dbus')
+        try:
+            self._notify_mail_app(bus, stats)
+            self._logger.info('notification sent to mail app')
+        except dbus.exceptions.DBusException, e:
+            self._logger.error('delivery to mail app failed')
+            self._notify_desktop(dbus, bus, stats)
+            self._logger.info('notification sent to desktop')
+
+    def _notify_mail_app(self, bus, stats):
+        obj = bus.get_object('net.soulayrol.MailNotifier',
+                             '/net/soulayrol/MailNotifier')
+        m = obj.get_dbus_method('notify', 'net.soulayrol.MailNotifier')
+        m(stats)
+
+    def _notify_desktop(self, dbus, bus, stats):
+        message = ''
+        for box, counts in stats.iteritems():
+            if counts[0] > 0:
+                message += '%d new messages in %s. %s old. Total: %s\n' % (
+                    counts[0], box, counts[1], counts[2])
+
+        obj = bus.get_object('org.freedesktop.Notifications',
+                             '/org/freedesktop/Notifications')
+        itf = dbus.Interface(obj, 'org.freedesktop.Notifications')
+        itf.Notify(
+            'sync_mail.py', 0, '', 'New Mail!', message, [], {}, -1)
 
     def _snapshot(self, accounts):
         snapshot = {}
