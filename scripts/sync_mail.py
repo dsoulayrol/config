@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO: Add a ! symbol on imap boxes which are real sources of
+#       messages. Other boxes should not be sorted.
 """
 Usage: sync_mail.py [--user login]
                     [--imap user:pass@server{box, ...}]
@@ -26,6 +28,7 @@ from __future__ import with_statement # This isn't required in Python 2.6
 import contextlib
 import errno
 import logging
+import mailbox
 import os
 import re
 import subprocess
@@ -136,12 +139,12 @@ def flock(path):
         os.unlink(path)
 
 
-class MailBox(object):
-    def __init__(self, folder, name):
+class MailboxStats(object):
+    def __init__(self, path, name):
         self._name = name
-        self._path = os.path.join(folder, name)
-        self._messages = 0
-        self._new = 0
+        self._path = path
+        self.new = 0
+        self.unread = 0
 
     def __repr__(self):
         return self._name
@@ -151,6 +154,18 @@ class MailBox(object):
 
     name = property(lambda self: self._name)
     path = property(lambda self: self._path)
+
+
+class MaildirWrapper(mailbox.Maildir, MailboxStats):
+    def __init__(self, path, name):
+        MailboxStats.__init__(self, path, name)
+        mailbox.Maildir.__init__(self, path, create=False)
+
+
+class MboxWrapper(mailbox.Maildir, MailboxStats):
+    def __init__(self, path, name):
+        MailboxStats.__init__(self, path, name)
+        mailbox.Maildir.__init__(self, path, create=False)
 
 
 class Account(object):
@@ -176,12 +191,27 @@ class Account(object):
     def _parse_mailbox(self, mb_name, folder):
         if mb_name.startswith('"'):
             mb_name = mb_name[1:-1]
-        if mb_name.startswith('$folder/'):
-            self._mailboxes.append(MailBox(folder, mb_name[8:]))
-        elif mb_name[0] in ['=', '+']:
-            self._mailboxes.append(MailBox(folder, mb_name[1:]))
+
+        try:
+            if mb_name.startswith('$folder/'):
+                self._mailboxes.append(
+                    self._generate_mailbox(folder, mb_name[8:]))
+            elif mb_name[0] in ['=', '+']:
+                self._mailboxes.append(
+                    self._generate_mailbox(folder, mb_name[1:]))
+            else:
+                self._logger.warn('unknown mailbox format %s' % mb_name)
+        except mailbox.NoSuchMailboxError:
+            self._logger.error('non existent mailbox %s' % mb_name)
+
+    def _generate_mailbox(self, folder, name):
+        path = os.path.join(folder, name)
+        if os.path.isdir(path):
+            return MaildirWrapper(path, name)
+        elif os.path.isfile(path):
+            return MboxWrapper(path, name)
         else:
-            self._logger.warn('unknown mailbox format %s' % mb_name)
+            raise mailbox.NoSuchMailboxError
 
     mailboxes = property(lambda self: self._mailboxes)
 
@@ -395,26 +425,26 @@ class MailHandler(object):
         self._logger.info('sorting new mail ...')
 
         # First take a snapshot of new mails on every mailbox to be
-        # sure they will ba handled only once.
+        # sure they will be handled only once.
         for box, mails in self._snapshot(self._conf.accounts).iteritems():
             self._logger.info('sorting %s ...' % box)
             for mail in mails:
                 proc = subprocess.Popen(
                     'procmail',
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                with open(os.path.join(box.path, 'new', mail)) as f:
-                    proc.communicate(f.read())
-                    if proc.returncode == 0:
-                        self._logger.info('sorted %s' % mail)
-                        try:
+                try:
+                    with open(os.path.join(box.path, 'new', mail)) as f:
+                        proc.communicate(f.read())
+                        if proc.returncode == 0:
+                            self._logger.info('sorted %s' % mail)
                             os.unlink(os.path.join(box.path, 'new', mail))
-                        except IOError, e:
-                            # It is possible the message was already
-                            # edited through mutt, specially with
-                            # spamassassin which is *very* slow :)
-                            self._logger.warn('could not unlink %s: %s' % (mail, e))
-                    else:
-                        self._logger.info('requeued %s !' % mail)
+                        else:
+                            self._logger.info('requeued %s !' % mail)
+                except (OSError, IOError):
+                    # It is possible the message was already
+                    # edited through mutt, specially with
+                    # spamassassin which is *very* slow :)
+                    self._logger.warn('could not unlink %s' % mail)
 
     def notify(self):
         """Notify the user using dbus.
@@ -441,7 +471,7 @@ class MailHandler(object):
         And here is a cron job sample, which calls this script every
         five minutes.
 
-        */5 * * * * source ~/.config/dbus_session; ~/bin/sync_mail.py > /tmp/mail.log
+        */5 * * * * source ~/.config/dbus_session; ~/bin/sync_mail.py > ~/mail.log
         """
         try:
             import dbus
