@@ -16,6 +16,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+This script provides a clean integration of multiple tools to handle
+mail. It is designed to fit well in my own configuration, which is:
+
+- Mutt as the MUA and Procmail as the MDA.
+- My Imap account is duplicated on my hard drive, which provides me
+    a full backup of my mail, which is also available while offline.
+- I have one POP account in my office.
+
+The script logically relies on isync to synchronise IMAP accounts, and
+procmail to distribute new mail. It reads its configuration from
+Mutt. POP fetching and glue is written using Python standard library.
+
+The script should be run with at least one --imap or --pop argument to
+provide mail sources since the information cannot be found in Mutt -
+this one being used as a simple MUA. The --user option can be used to
+override the user name, which can be useful if the environment doesn't
+have the USER or LOGNAME variables set.
+
 Usage: sync_mail.py [--user login]
                     [--imap user:pass@server{[!]box, ...}]
                     [--pop user:pass@server]
@@ -32,6 +50,7 @@ import poplib
 import re
 import subprocess
 import sys
+import time
 import tempfile
 
 try:
@@ -210,8 +229,8 @@ class MailboxStats(object):
     def __init__(self, path, name):
         self._name = name
         self._path = path
-        self.new = 0
-        self.unread = 0
+        self._new = 0
+        self._unread = 0
 
     def __repr__(self):
         return '[M:' + self._name + ']'
@@ -228,14 +247,28 @@ class MailboxStats(object):
     def _get_full_path(self):
         return os.path.join(self._path, self._name)
 
+    def _get_new(self):
+        return self._new
+
+    def _set_new(self, value):
+        self._new = value
+
+    def _get_unread(self):
+        return self._unread
+
+    def _set_unread(self, value):
+        self._unread = value
+
     name = property(_get_name)
     path = property(_get_path)
     full_path = property(_get_full_path)
+    new = property(_get_new, _set_new)
+    unread = property(_get_unread, _set_unread)
 
 
 class MaildirWrapper(mailbox.Maildir):
     def __init__(self, options, stats):
-        mailbox.Maildir.__init__(self, stats.full_path, create=False)
+        mailbox.Maildir.__init__(self, stats.full_path, factory=None, create=False)
         self.options = options
         self.stats = stats
 
@@ -245,12 +278,38 @@ class MaildirWrapper(mailbox.Maildir):
     def __str__(self):
         return self.__repr__()
 
+    def add(self, message):
+        mailbox.Maildir.add(self, message)
+        self.stats.new += 1
+
+    def is_message_read(self, msg):
+        return msg.get_flags().find('S') >= 0
+
+    def is_message_sorted(self, msg):
+        return msg.get_subdir() != 'new'
+
 
 class MboxWrapper(mailbox.mbox):
     def __init__(self, options, stats):
         mailbox.mbox.__init__(self, stats.full_path, create=False)
         self.options = options
         self.stats = stats
+
+    def __repr__(self):
+        return '[MBox:' + repr(self.stats) + ']'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def add(self, message):
+        mailbox.mbox.add(self, message)
+        self.stats.new += 1
+
+    def is_message_read(self, msg):
+        return msg.get_flags().find('R') >= 0
+
+    def is_message_sorted(self, msg):
+        return not self.is_message_read(msg)
 
 
 class Account(object):
@@ -266,6 +325,9 @@ class Account(object):
 
     def __str__(self):
         return self.__repr__()
+
+    def _get_mailboxes(self):
+        return self._mailboxes
 
     def _parse(self, mailbox_options):
         with open(self._file) as f:
@@ -305,16 +367,17 @@ class Account(object):
         else:
             raise mailbox.NoSuchMailboxError
 
-    mailboxes = property(lambda self: self._mailboxes)
+    mailboxes = property(_get_mailboxes)
 
 
 class Configuration(object):
     def __init__(self):
         self._logger = create_logger(self.__class__.__name__)
-        self._user = self._get_user()
+        self._user = self._guess_user()
         self._accounts = []
         self._root_path = os.path.join('/home', self._user)
         self._folder = os.path.join(self._root_path, 'Mail')
+        self._timestamp = time.time()
 
     def parse(self):
         """Mutt configuration parser.
@@ -344,7 +407,19 @@ class Configuration(object):
                 if box.stats.name == name:
                     return box
 
+    def _get_accounts(self):
+        return self._accounts
+
+    def _get_folder(self):
+        return self._folder
+
+    def _get_timestamp(self):
+        return self._timestamp
+
     def _get_user(self):
+        return self._user
+
+    def _guess_user(self):
         """Search for the user name.
 
         User name is determined using, in this order, the --user
@@ -421,9 +496,10 @@ class Configuration(object):
             self._accounts.append(
                 Account(os.path.join(path, f), self._folder, mailbox_options))
 
-    user = property(lambda self: self._user)
-    accounts = property(lambda self: self._accounts)
-    folder = property(lambda self: self._folder)
+    accounts = property(_get_accounts)
+    folder = property(_get_folder)
+    timestamp = property(_get_timestamp)
+    user = property(_get_user)
 
 
 class IMAPSynchroniser(object):
@@ -448,21 +524,23 @@ class IMAPSynchroniser(object):
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         status_re = re.compile(
             '^Selecting (?P<side>\w+) (?P<name>.+)\.\.\. (?P<msg>\d+) messages, (?P<new>\d+) recent')
-        current_pair = {}
-        line = proc.stdout.readline()
-        while line != '':
-            # TODO: improve reporting
-            self._logger.debug('  (isync: ' + line[:-1] + ')')
-            m = status_re.match(line)
-            if m:
-                current_pair[m.group('side')] = m.group('name')
-            if len(current_pair) == 2:
-                self._log_status(current_pair['slave'], current_pair['master'])
-                current_pair = {}
-            line = proc.stdout.readline()
 
-        proc.wait()
-        os.unlink(conf_filename)
+        try:
+            current_pair = {}
+            line = proc.stdout.readline()
+            while line != '':
+                self._logger.debug('  (isync: ' + line[:-1] + ')')
+                m = status_re.match(line)
+                if m:
+                    current_pair[m.group('side')] = (
+                        m.group('name'), m.group('msg'), m.group('new'))
+                if len(current_pair) == 2:
+                    self._update_status(current_pair)
+                    current_pair = {}
+                line = proc.stdout.readline()
+            proc.wait()
+        finally:
+            os.unlink(conf_filename)
 
     def _build_configuration(self):
         """Parse imap arguments on the command line to create the configuration.
@@ -504,8 +582,13 @@ class IMAPSynchroniser(object):
         self._logger.debug('flushed isync configuration into %s' % name)
         return name
 
-    def _log_status(self, local, distant):
-        self._logger.info('  %s <==> %s' % (local, distant))
+    def _update_status(self, pair):
+        server = pair['master']
+        local = pair['slave']
+        box = self._conf.get_mailbox(local[0])
+        box.stats.new += int(server[2])
+        self._logger.info('Synchronising %s with %s (%s new messages)' % (
+                local[0], server[0], server[2]))
 
 
 class POPFetcher(object):
@@ -528,51 +611,41 @@ class POPFetcher(object):
                 box = boxes[0]
                 box.lock()
                 try:
-                    for i in range(len(ctl.list()[1])):
-                        message = '\r\n'.join(ctl.retr(i+1)[1])
+                    for i in range(1, len(ctl.list()[1]) + 1):
+                        message = '\r\n'.join(ctl.retr(i)[1])
                         self._conf.get_mailbox('inbox').add(message)
-                        self._logger.debug('  fetched message %d' % (i+1))
-                        ctl.dele(i+1)
+                        self._conf.get_mailbox('inbox').stats
+                        self._logger.debug('  fetched message %d' % (i))
+                        ctl.dele(i)
                 finally:
                     ctl.quit()
 
 
 class MailHandler(object):
-    """A tool to sort and inspect mailboxes."""
-    # TODO: port this class to the mailbox standard API. Will allow to
-    #       distinguish unread from unseen mails, and parse mbox.
-
-    # TODO: ensure that already sorted mail do not get
-    #       resorted. Perhaps will it be simple with mailbox
-    #       module. Or use a timestamp.
+    """A wrapper around procmail and companion tools."""
+    # TODO: ensure that already sorted mail do not get resorted. Use a timestamp.
     def __init__(self, conf):
         self._logger = create_logger(self.__class__.__name__)
         self._conf = conf
+        self._log = os.path.join('/tmp', 'procmail.' + str(conf.timestamp))
+
+    def cleanup(self):
+        os.unlink(self._log)
 
     def sort(self):
         self._logger.info('sorting new mail ...')
 
-        # First take a snapshot of new mails on every mailbox to be
-        # sure they will be handled only once.
-        for box, mails in self._snapshot(self._conf.accounts).iteritems():
-            self._logger.info('sorting %s ...' % box)
-            for mail in mails:
-                proc = subprocess.Popen(
-                    'procmail',
-                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                try:
-                    with open(os.path.join(box.stats.full_path, 'new', mail)) as f:
-                        proc.communicate(f.read())
-                        if proc.returncode == 0:
-                            self._logger.info('sorted %s' % mail)
-                            os.unlink(os.path.join(box.stats.full_path, 'new', mail))
-                        else:
-                            self._logger.info('requeued %s !' % mail)
-                except (OSError, IOError):
-                    # It is possible the message was already
-                    # edited through mutt, specially with
-                    # spamassassin which is *very* slow :)
-                    self._logger.warn('could not unlink %s' % mail)
+        # Parse the whole mailbox to sort and get stats as well. Does
+        # this take too much of a hammer to hit a fly ? (and is this
+        # french idiom correctly translated) :)
+        for account in self._conf.accounts:
+            for box in (b for b in account.mailboxes if b.stats.new):
+                box.lock()
+                self._logger.info('sorting %s ...' % box)
+                for key, msg in box.iteritems():
+                    if not box.is_message_sorted(msg):
+                        self._sort(box, key, msg)
+                box.unlock()
 
     def notify(self):
         """Notify the user using dbus.
@@ -601,6 +674,8 @@ class MailHandler(object):
 
         */5 * * * * source ~/.config/dbus_session; ~/bin/sync_mail.py > ~/mail.log
         """
+        self._logger.info('sending notification ...')
+
         if not dbus:
             self._logger.warn('dbus module is not installed')
             return
@@ -609,11 +684,13 @@ class MailHandler(object):
             self._logger.warn('DBus session not available')
             return
 
-        bus = dbus.SessionBus()
+        try:
+            bus = dbus.SessionBus()
+        except dbus.exceptions.DBusException:
+            self._logger.warn('could not connect to dbus')
+            return
 
-        stats = {}
-        for box, mails in self._snapshot(self._conf.accounts).iteritems():
-            stats[box.stats.name] = [len(mails), 0, 0]
+        stats = self._count()
 
         try:
             self._notify_mail_app(bus, stats)
@@ -642,17 +719,47 @@ class MailHandler(object):
             itf = dbus.Interface(obj, 'org.freedesktop.Notifications')
             itf.Notify('sync_mail.py', 0, '', 'New Mail!', message, [], {}, -1)
 
-    def _snapshot(self, accounts):
-        snapshot = {}
-        for account in accounts:
-            for box in account.mailboxes:
-                path = os.path.join(box.stats.full_path, 'new')
-                if os.path.isdir(path):
-                    snapshot[box] = os.listdir(path)
-                else:
-                    self._logger.warn(
-                        '%s (%s) is not a valid maildir box ' % (box, box.stats.full_path))
-        return snapshot
+    def _count(self):
+        """Count the sorted messages.
+
+        Using the procmail output is far quicker than to iterate over
+        messages using the python API to check what messages are read.
+        """
+        # TODO: there should be a system of aliases to associate
+        # outputs from procmail to configured mailboxes. For example,
+        # in the case of script pipes.
+        proc = subprocess.Popen(
+            ['mailstat', '-klmt', self._log],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        line_re = re.compile('^\s+\d+\s+\d+\s+(?P<nb>\d+) (?P<target>.+)')
+
+        stats = {}
+        line = proc.stdout.readline()
+        while line != '':
+            self._logger.debug('  (mailstat: ' + line[:-1] + ')')
+            m = line_re.match(line)
+            if m:
+                box = m.group('target')
+                if box.endswith('/'):
+                    box = box[:-1]
+                if self._conf.get_mailbox(box):
+                    stats[box] = (int(m.group('nb')), 0, 0)
+            line = proc.stdout.readline()
+        proc.wait()
+        return stats
+
+    def _sort(self, box, key, msg):
+        proc = subprocess.Popen(
+            ['procmail', '-a', self._log],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc.communicate(msg.as_string())
+        if proc.returncode == 0:
+            self._logger.info(
+                'sorted %s' % msg.get('Subject', '<undefined subject>'))
+            box.discard(key)
+        else:
+            self._logger.info(
+                'requeued %s !' % msg.get('Subject', '<undefined subject>'))
 
 
 # Main functions
@@ -663,8 +770,6 @@ def start_sync():
     #     sys.exit(1)
 
     try:
-        logger = create_logger(__name__)
-
         # Install lock.
         with flock(os.path.join(os.environ['HOME'], '.sync_mail.lock')):
 
@@ -678,17 +783,14 @@ def start_sync():
             # Fetch mail from distant POP accounts.
             POPFetcher(config).run()
 
-            # Sort incoming mail
+            # Handle incoming mail and notify the user.
             mail_handler = MailHandler(config)
             mail_handler.sort()
-
-            # Count new mails and notify the user through dbus.
             mail_handler.notify()
+            #mail_handler.cleanup()
 
-    except OSError, e:
-        logger.error('Lock error: %s' % e)
     except LockError:
-        print 'Another instance is already running.'
+        sys.exit(2)
 
 if __name__ == '__main__':
     start_sync()
