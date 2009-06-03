@@ -31,7 +31,9 @@ beautiful.init(theme_path)
 --     |_ menu
 --     |_ gadgets
 --     |_ widgets
+--           |_ launcher
 --           |_ datebox
+--           |_ systray
 --     |     \_ user defined widgets...
 --     \_ screens
 --           |_ tags
@@ -42,10 +44,14 @@ beautiful.init(theme_path)
 --                \_ taglist
 
 conf = {}
+conf.param = {}
 conf.bindings = { global = {}, client = {} }
 conf.screens = {}
 conf.gadgets = {}
 conf.widgets = {}
+
+-- Load local parameters
+dofile(awful.util.getdir('config') .. '/local.lua')
 
 -- Default modkey.
 conf.modkey = 'Mod4'
@@ -85,8 +91,9 @@ conf.apps.floats = {
 -- Applications to be moved to a pre-defined tag by class or instance.
 -- Use the screen and tags indices.
 conf.apps.tags = {
-   ["Firefox"] = { screen = 1, tag = 2 },
-   ["Emacs"] = { screen = 1, tag = 3 },
+   ["Emacs"] = { screen = 1, tag = 2 },
+   ["xchat"] = { screen = 1, tag = 3 },
+   ["Iceweasel"] = { screen = 1, tag = 4 },
 }
 
 -- Menu
@@ -105,19 +112,27 @@ conf.menu = awful.menu.new(
              }
    })
 
+-- Create a launcher widget
+conf.widgets.launcher =
+   awful.widget.launcher{ image = image(beautiful.awesome_icon), menu = conf.menu }
+
 -- Common widgets
 dofile(awful.util.getdir('config') .. '/gadgets.lua')
 
--- Create a laucher widget
-local w_launcher =
-   awful.widget.launcher{ image = image(beautiful.awesome_icon), menu = conf.menu }
 
--- Create a systray
-local w_systray = widget{ type = "systray", align = "right" }
-
-
--- Tags
-local tag_names = { 'Term', 'Net', 'Edit', '4', '5', '6', '7', '8', '9' }
+-- Default tag properties
+local tag_names = { '1:Term', '2:Edit', '3:IRC', '4:Net', '5', '6', '7', '8:Wire', '9' }
+local tag_layouts = {
+   awful.layout.suit.tile,
+   awful.layout.suit.max,
+   awful.layout.suit.tile.bottom,
+   awful.layout.suit.tile.bottom,
+   awful.layout.suit.tile,
+   awful.layout.suit.tile,
+   awful.layout.suit.tile,
+   awful.layout.suit.tile.bottom,
+   awful.layout.suit.tile,
+}
 
 -- Populate screens
 for s = 1, screen.count() do
@@ -131,7 +146,7 @@ for s = 1, screen.count() do
       conf.screens[s].tags[tagnumber] = tag(tag_names[tagnumber])
       -- Add tags to screen one by one
       conf.screens[s].tags[tagnumber].screen = s
-      awful.layout.set(conf.layouts[1], conf.screens[s].tags[tagnumber])
+      awful.layout.set(tag_layouts[tagnumber], conf.screens[s].tags[tagnumber])
    end
    -- I'm sure you want to see at least one tag.
    conf.screens[s].tags[1].selected = true
@@ -170,17 +185,15 @@ for s = 1, screen.count() do
        conf.screens[s].widgets.taglist,
        conf.screens[s].widgets.layout,
        conf.screens[s].widgets.prompt,
-       widget{ type = 'textbox', align = 'left', text = 'CPU ' },
        conf.gadgets.cpu_icon.widget,
        conf.gadgets.cpugraph.widget,
-       widget{ type = 'textbox', align = 'left', text = 'NET ' },
 --       w_wifi_widget,
-       conf.gadgets.netgraph.widget,
-       conf.gadgets.netbox.widget,
-       conf.gadgets.battery_icon.widget,
-       conf.gadgets.battery_box.widget,
+       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
+       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
+       conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
+       conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
 --       w_sound_widget,
-       s == 1 and w_systray or nil,
+       s == 1 and conf.widgets.systray or nil,
        conf.widgets.datebox
     }
 
