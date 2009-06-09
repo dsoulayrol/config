@@ -603,9 +603,13 @@ class POPFetcher(object):
         for server, boxes in self._conf.get_accounts_by_server().items():
             if isinstance(server, POP3Server):
                 self._logger.info('  fetching from %s' % server.name)
-                ctl = poplib.POP3(server.name)
-                ctl.user(server.user)
-                ctl.pass_(server.passwd)
+                try:
+                    ctl = poplib.POP3(server.name)
+                    ctl.user(server.user)
+                    ctl.pass_(server.passwd)
+                except IOError, e:
+                    self._logger.warn('  connection failed: %s' % (e))
+                    continue
 
                 # Only support only one box here. Should be the spool.
                 box = boxes[0]
@@ -693,6 +697,8 @@ class MailHandler(object):
         stats = self._count()
 
         try:
+            # Note that currently, notification is sent to the mail
+            # app whatever the messages count.
             self._notify_mail_app(bus, stats)
             self._logger.info('notification sent to mail app')
         except dbus.exceptions.DBusException:
