@@ -62,11 +62,11 @@ awful.hooks.manage.register(
       awful.titlebar.add(c, { modkey = conf.modkey })
 
       -- Add mouse bindings
-      c:buttons({
-                   button({ }, 1, function (c) client.focus = c; c:raise() end),
-                   button({ conf.modkey }, 1, awful.mouse.client.move),
-                   button({ conf.modkey }, 3, awful.mouse.client.resize)
-                })
+      c:buttons(awful.util.table.join(
+                   awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
+                   awful.button({ conf.modkey }, 1, awful.mouse.client.move),
+                   awful.button({ conf.modkey }, 3, awful.mouse.client.resize)
+             ))
 
       -- New client may not receive focus
       -- if they're not focusable, so set border anyway.

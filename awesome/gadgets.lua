@@ -14,7 +14,7 @@ end
 -- Create common widgets
 conf.widgets.systray = widget{ type = "systray", align = "right" }
 conf.widgets.datebox = widget({ type = "textbox", align = "right" })
-conf.widgets.datebox.text = "<b><small> " .. AWESOME_RELEASE .. " </small></b>"
+conf.widgets.datebox.text = "<b><small> " .. awesome.release .. " </small></b>"
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.new(

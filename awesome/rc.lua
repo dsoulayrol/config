@@ -14,8 +14,7 @@ require('flaw')
 require("debian.menu")
 
 -- Load theme
-local theme_path = awful.util.getdir('config') .. '/theme'
-beautiful.init(theme_path)
+beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 
 -- Variable definitions
 
