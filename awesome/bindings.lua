@@ -77,7 +77,19 @@ conf.bindings.global = awful.util.table.join(
                                  awful.util.spawn, awful.completion.bash,
                                  awful.util.getdir("cache") .. "/history")
              end),
-
+   awful.key({ conf.modkey }, "F2",
+             function ()
+                awful.prompt.run({ prompt = "Web search: " },
+                                 conf.screens[mouse.screen].widgets.prompt,
+                                 function (command)
+                                    awful.util.spawn("firefox -new-tab 'http://yubnub.org/parser/parse?command=" .. command .. "'", false)
+                                    -- Switch to the web tag, where Firefox is, in this case tag 3
+                                    local tags = conf.apps.tags['Iceweasel']
+                                    if tags then
+                                       awful.tag.viewonly(conf.screens[tags.screen].tags[tags.tag])
+                                    end
+                                 end)
+             end),
    awful.key({ conf.modkey }, "F4",
         function ()
            awful.prompt.run({ prompt = "Run Lua code: " },
