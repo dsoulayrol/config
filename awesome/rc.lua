@@ -211,9 +211,6 @@ dofile(awful.util.getdir('config') .. '/hooks.lua')
 -- Move the mouse out of the way.
 local safeCoords = { x = 1440, y = 900 }
 
--- Flag to tell Awesome whether to do this at startup.
-local moveMouseOnStartup = true
-
 -- Simple function to move the mouse to the coordinates set above.
 local function moveMouse(x_co, y_co)
     mouse.coords({ x=x_co, y=y_co })
@@ -225,6 +222,6 @@ end
 --           function() moveMouse(safeCoords.x, safeCoords.y) end):add()
 
 -- Optionally move the mouse when rc.lua is read (startup)
-if moveMouseOnStartup then
-        moveMouse(safeCoords.x, safeCoords.y)
+if conf.param.mouse_move_aside then
+   moveMouse(safeCoords.x, safeCoords.y)
 end
