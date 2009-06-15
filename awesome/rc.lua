@@ -180,7 +180,7 @@ for s = 1, screen.count() do
 
     -- Add widgets to the wibox - order matters
     conf.screens[s].wibox.widgets = {
-       w_launcher,
+       conf.widgets.launcher,
        conf.screens[s].widgets.taglist,
        conf.screens[s].widgets.layout,
        conf.screens[s].widgets.prompt,
