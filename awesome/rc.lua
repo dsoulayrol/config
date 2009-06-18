@@ -157,21 +157,21 @@ for s = 1, screen.count() do
    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
    conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "left" }
    conf.screens[s].widgets.layout:buttons(
-      { awful.button({ }, 1, function () awful.layout.inc(conf.layouts, 1) end),
-        awful.button({ }, 3, function () awful.layout.inc(conf.layouts, -1) end),
-        awful.button({ }, 4, function () awful.layout.inc(conf.layouts, 1) end),
-        awful.button({ }, 5, function () awful.layout.inc(conf.layouts, -1) end) })
+      { button({ }, 1, function () awful.layout.inc(conf.layouts, 1) end),
+        button({ }, 3, function () awful.layout.inc(conf.layouts, -1) end),
+        button({ }, 4, function () awful.layout.inc(conf.layouts, 1) end),
+        button({ }, 5, function () awful.layout.inc(conf.layouts, -1) end) })
 
    -- Create a taglist widget
    conf.screens[s].widgets.taglist =
       awful.widget.taglist.new(
       s, awful.widget.taglist.label.all, {
-         awful.button({ }, 1, awful.tag.viewonly),
-         awful.button({ conf.modkey }, 1, awful.client.movetotag),
-         awful.button({ }, 3, function (tag) tag.selected = not tag.selected end),
-         awful.button({ conf.modkey }, 3, awful.client.toggletag),
-         awful.button({ }, 4, awful.tag.viewnext),
-         awful.button({ }, 5, awful.tag.viewprev) }
+         button({ }, 1, awful.tag.viewonly),
+         button({ conf.modkey }, 1, awful.client.movetotag),
+         button({ }, 3, function (tag) tag.selected = not tag.selected end),
+         button({ conf.modkey }, 3, awful.client.toggletag),
+          button({ }, 4, awful.tag.viewnext),
+          button({ }, 5, awful.tag.viewprev) }
     )
 
     -- Create the wibox
