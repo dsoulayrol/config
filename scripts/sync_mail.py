@@ -285,8 +285,8 @@ class MaildirWrapper(mailbox.Maildir):
     def is_message_read(self, msg):
         return msg.get_flags().find('S') >= 0
 
-    def is_message_sorted(self, msg):
-        return msg.get_subdir() != 'new'
+    def is_message_sorted(self, msg, timestamp):
+        return msg.get_subdir() != 'new' and msg.get_date() < timestamp
 
 
 class MboxWrapper(mailbox.mbox):
@@ -308,7 +308,8 @@ class MboxWrapper(mailbox.mbox):
     def is_message_read(self, msg):
         return msg.get_flags().find('R') >= 0
 
-    def is_message_sorted(self, msg):
+    def is_message_sorted(self, msg, timestamp):
+        # TODO: introduce test on timestamp.
         return not self.is_message_read(msg)
 
 
@@ -627,7 +628,6 @@ class POPFetcher(object):
 
 class MailHandler(object):
     """A wrapper around procmail and companion tools."""
-    # TODO: ensure that already sorted mail do not get resorted. Use a timestamp.
     def __init__(self, conf):
         self._logger = create_logger(self.__class__.__name__)
         self._conf = conf
@@ -647,7 +647,7 @@ class MailHandler(object):
                 box.lock()
                 self._logger.info('sorting %s ...' % box)
                 for key, msg in box.iteritems():
-                    if not box.is_message_sorted(msg):
+                    if not box.is_message_sorted(msg, self._conf.timestamp):
                         self._sort(box, key, msg)
                 box.unlock()
 
