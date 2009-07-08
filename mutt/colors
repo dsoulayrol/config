@@ -114,15 +114,15 @@ color body brightwhite black "<[Bb][Gg]>"                        # <bg>
 color body brightwhite black " [;:]-*[})>{(<|]"                  # :-) etc...
 
 # *bold*
-color body brightblue  black "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
+color body brightcyan  black "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
 mono  body bold                "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
 
 # _underline_
-color body brightblue  black "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
+color body brightcyan  black "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
 mono  body underline           "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
 
 # /italic/  (Sometimes gets directory names)
-#color body brightblue  black "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
+#color body brightcyan  black "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
 #mono  body underline           "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
 
 # Border lines.

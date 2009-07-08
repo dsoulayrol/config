@@ -12,6 +12,9 @@
 # Identity
 set realname = "David Soulayrol"
 
+# Leave my bits alone :)
+set charset = "utf-8"
+
 # Rely on sendmail (or any alternative)
 #set sendmail = "/usr/sbin/sendmail"
 set sendmail="/usr/sbin/sendmail -v -X /tmp/esmtp.log"
@@ -33,21 +36,34 @@ set message_cachedir = "~/.mutt/cache"
 set use_from = yes
 set envelope_from = yes
 
-# Rely on abook
-set query_command = 'abook --mutt-query "%s"'
-macro generic,index,pager \ca \
-  "<shell-escape>abook<return>" \
-  "lancer abook"
-macro index,pager A \
-  "<pipe-message>abook --add-email<return>" \
-  "ajouter l'expéditeur à abook"
+# Use LBDB for address book
+set query_command="lbdbq '%s'"
+
+# Edit headers along with the body
+set edit_headers
 
 # Use a special instance of emacs to write mails.
 set editor = "emacs -nw --no-splash --no-init-file --load ~/.mutt/emacs"
 
+# Mailcap preferences
+set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
+
+# Calendar (uses wyrd)
+macro generic,pager <f2> "<shell-escape>wyrd<enter>" "Launch wyrd"
+
+# Mail search (uses maidir-utils)
+macro index <F8> "<shell-escape>rm -rf ~/.mumatch; mu-find -o l -l ~/.mumatch " "mu-find"
+macro index <F9> "<change-folder-readonly>~/.mumatch" "display mu-find results"
+
+# Printing
+set print_command="muttprint"
+
 # ----------------------------------------------------------------------------
 #  display
 # ----------------------------------------------------------------------------
+
+# Index format
+set index_format = "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
 
 # Sorting
 # (date-received, date-sent, from, mailbox-order, size, subject, threads,
@@ -56,7 +72,9 @@ set editor = "emacs -nw --no-splash --no-init-file --load ~/.mutt/emacs"
 #  instead of first one)
 #
 set sort = threads
-set sort_aux=date
+set sort_aux = date
+set strict_threads = no
+#set sort_re = no
 
 # Sorting in File-Browser
 # (date, alpha, reverse-*)
@@ -64,9 +82,13 @@ set sort_aux=date
 set sort_browser = alpha
 
 # Display of different MIME parts using mailcap entries.
-auto_view text/html text/enriched application/x-gunzip\
-          application/postscript image/gif application/x-tar-gz
-alternative_order text/enriched text/plain text application/postscript image/*
+auto_view text/html text/enriched text/x-vcard
+auto_view application/x-gunzip application/x-tar-gz
+auto_view application/pdf application/postscript image/gif
+
+alternative_order text/enriched text/plain text \
+                  application/postscript application/pdf \
+                  image/*
 
 #
 # Sorting of aliases:
@@ -129,6 +151,10 @@ source ~/.mutt/mls
 # The following line loads all the files present in the accounts subdirectory.
 # It is thus possible to create one file per account.
 source 'cat ~/.mutt/accounts/*|'
+
+# Aliases
+set alias_file = ~/.mutt/aliases
+source ~/.mutt/aliases
 
 # Bogofilter integration
 macro index H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Apprendre comme ham"
