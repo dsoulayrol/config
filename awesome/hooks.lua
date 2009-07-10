@@ -59,7 +59,7 @@ awful.hooks.manage.register(
       end
 
       -- Add a titlebar
-      awful.titlebar.add(c, { modkey = conf.modkey })
+      --awful.titlebar.add(c, { modkey = conf.modkey })
 
       -- Add mouse bindings
       c:buttons(awful.util.table.join(
