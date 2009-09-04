@@ -273,7 +273,7 @@ class MaildirWrapper(mailbox.Maildir):
         self.stats = stats
 
     def __repr__(self):
-        return '[Maildir:' + repr(self.stats) + ']'
+        return '[Maildir:' + self.stats.name + ']'
 
     def __str__(self):
         return self.__repr__()
@@ -286,7 +286,7 @@ class MaildirWrapper(mailbox.Maildir):
         return msg.get_flags().find('S') >= 0
 
     def is_message_sorted(self, msg, timestamp):
-        return msg.get_subdir() != 'new' and msg.get_date() < timestamp
+        return msg.get_date() < timestamp
 
 
 class MboxWrapper(mailbox.mbox):
@@ -634,7 +634,8 @@ class MailHandler(object):
         self._log = os.path.join('/tmp', 'procmail.' + str(conf.timestamp))
 
     def cleanup(self):
-        os.unlink(self._log)
+        if os.path.exists(self._log):
+            os.unlink(self._log)
 
     def sort(self):
         self._logger.info('sorting new mail ...')
@@ -695,16 +696,16 @@ class MailHandler(object):
             return
 
         stats = self._count()
-
-        try:
-            # Note that currently, notification is sent to the mail
-            # app whatever the messages count.
-            self._notify_mail_app(bus, stats)
-            self._logger.info('notification sent to mail app')
-        except dbus.exceptions.DBusException:
-            self._logger.warn('delivery to mail app failed')
-            self._notify_desktop(bus, stats)
-            self._logger.info('notification sent to desktop')
+        if stats:
+            try:
+                # Note that currently, notification is sent to the mail
+                # app whatever the messages count.
+                self._notify_mail_app(bus, stats)
+                self._logger.info('notification sent to mail app')
+            except dbus.exceptions.DBusException:
+                self._logger.warn('delivery to mail app failed')
+                self._notify_desktop(bus, stats)
+                self._logger.info('notification sent to desktop')
 
     def _notify_mail_app(self, bus, stats):
         obj = bus.get_object('net.soulayrol.MailNotifier',
@@ -716,7 +717,7 @@ class MailHandler(object):
         message = ''
         for box, counts in stats.iteritems():
             if counts[0] > 0:
-                message += '%d new messages in %s. %s old. Total: %s\n' % (
+                message += '%d new messages in %s. %s unread. Total: %s\n' % (
                     counts[0], box, counts[1], counts[2])
 
         if message:
@@ -734,25 +735,26 @@ class MailHandler(object):
         # TODO: there should be a system of aliases to associate
         # outputs from procmail to configured mailboxes. For example,
         # in the case of script pipes.
-        proc = subprocess.Popen(
-            ['mailstat', '-klmt', self._log],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        line_re = re.compile('^\s+\d+\s+\d+\s+(?P<nb>\d+) (?P<target>.+)')
+        if os.path.exists(self._log):
+            proc = subprocess.Popen(
+                ['mailstat', '-klmt', self._log],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            line_re = re.compile('^\s+\d+\s+\d+\s+(?P<nb>\d+) (?P<target>.+)')
 
-        stats = {}
-        line = proc.stdout.readline()
-        while line != '':
-            self._logger.debug('  (mailstat: ' + line[:-1] + ')')
-            m = line_re.match(line)
-            if m:
-                box = m.group('target')
-                if box.endswith('/'):
-                    box = box[:-1]
-                if self._conf.get_mailbox(box):
-                    stats[box] = (int(m.group('nb')), 0, 0)
+            stats = {}
             line = proc.stdout.readline()
-        proc.wait()
-        return stats
+            while line != '':
+                self._logger.debug('  (mailstat: ' + line[:-1] + ')')
+                m = line_re.match(line)
+                if m:
+                    box = m.group('target')
+                    if box.endswith('/'):
+                        box = box[:-1]
+                    if self._conf.get_mailbox(box):
+                        stats[box] = (int(m.group('nb')), 0, 0)
+                line = proc.stdout.readline()
+            proc.wait()
+            return stats
 
     def _sort(self, box, key, msg):
         proc = subprocess.Popen(
