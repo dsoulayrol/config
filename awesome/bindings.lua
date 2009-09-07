@@ -35,6 +35,33 @@ function _get_tag_info()
    naughty.notify{ text = v:sub(1,#v-1), timeout = 0, margin = 10 }
 end
 
+function _get_client_info()
+   local v = ""
+
+   -- object
+   local c = client.focus
+   v = v .. tostring(c)
+
+   -- geometry
+   local cc = c:geometry()
+   local signx = (cc.x > 0 and "+") or ""
+   local signy = (cc.y > 0 and "+") or ""
+   v = v .. " @ " .. cc.width .. 'x' .. cc.height .. signx .. cc.x .. signy .. cc.y .. "\n\n"
+
+   local inf = {
+      "name", "icon_name", "type", "class", "role", "instance", "pid",
+      "icon_name", "skip_taskbar", "id", "group_id", "leader_id", "machine",
+      "screen", "hide", "minimize", "size_hints_honor", "titlebar", "urgent",
+      "focus", "opacity", "ontop", "above", "below", "fullscreen", "transient_for"
+   }
+
+   for i = 1, #inf do
+      v = v .. string.format("%2s: %-16s = %s\n", i, inf[i], tostring(c[inf[i]]))
+   end
+
+   naughty.notify{ text = v:sub(1,#v-1), timeout = 0, margin = 10 }
+end
+
 -- Mouse bindings
 root.buttons(
    awful.util.table.join(
@@ -44,10 +71,13 @@ root.buttons(
 ))
 
 conf.bindings.global = awful.util.table.join(
+
+   -- tags
    awful.key({ conf.modkey,           }, "Left",   awful.tag.viewprev       ),
    awful.key({ conf.modkey,           }, "Right",  awful.tag.viewnext       ),
    awful.key({ conf.modkey,           }, "Escape", awful.tag.history.restore),
 
+   -- clients
    awful.key({ conf.modkey,           }, "j",
              function ()
                 awful.client.focus.byidx( 1)
@@ -58,8 +88,6 @@ conf.bindings.global = awful.util.table.join(
                 awful.client.focus.byidx(-1)
                 if client.focus then client.focus:raise() end
              end),
-
-   -- Layout manipulation
    awful.key({ conf.modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1) end),
    awful.key({ conf.modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1) end),
    awful.key({ conf.modkey, "Control" }, "j", function () awful.screen.focus( 1)       end),
@@ -73,11 +101,7 @@ conf.bindings.global = awful.util.table.join(
                 end
              end),
 
-    -- Standard program
-   awful.key({ conf.modkey,           }, "Return", function () awful.util.spawn(conf.apps.terminal) end),
-   awful.key({ conf.modkey, "Control" }, "r", awesome.restart),
-   awful.key({ conf.modkey, "Shift"   }, "q", awesome.quit),
-
+   -- layout
    awful.key({ conf.modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
    awful.key({ conf.modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
    awful.key({ conf.modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
@@ -87,15 +111,21 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ conf.modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
    awful.key({ conf.modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
-   -- Shifty dedicated bindings.
+    -- standard program
+   awful.key({ conf.modkey,           }, "Return", function () awful.util.spawn(conf.apps.terminal) end),
+   awful.key({ conf.modkey, "Control" }, "r", awesome.restart),
+   awful.key({ conf.modkey, "Shift"   }, "q", awesome.quit),
+
+   -- shifty dedicated bindings
    awful.key({ conf.modkey,           }, "t", function() shifty.add({ rel_index = 1 }) end, nil, "new tag"),
    awful.key({ conf.modkey, "Control" }, "t", function() shifty.add({ rel_index = 1, nopopup = true }) end, nil, "new tag in bg"),
    awful.key({ conf.modkey,           }, "r", shifty.rename, nil, "tag rename"),
    awful.key({ conf.modkey,           }, "w", shifty.del, nil, "tag delete"),
+
+   -- diagnostic
    awful.key({ conf.modkey,           }, 'i', _get_tag_info, nil, "tag info"),
 
    -- Prompt
---   awful.key({ conf.modkey            }, "F1"   , function () conf.screens[mouse.screen].widgets.prompt:run() end),
    awful.key({ conf.modkey }, "F1",
              function ()
                 awful.prompt.run({ prompt = "Run: " },
@@ -109,20 +139,18 @@ conf.bindings.global = awful.util.table.join(
                                  conf.screens[mouse.screen].widgets.prompt,
                                  function (command)
                                     awful.util.spawn("firefox -new-tab 'http://yubnub.org/parser/parse?command=" .. command .. "'", false)
-                                    -- Switch to the web tag, where Firefox is, in this case tag 3
-                                    local tags = conf.apps.tags['Iceweasel']
-                                    if tags then
-                                       awful.tag.viewonly(conf.screens[tags.screen].tags[tags.tag])
-                                    end
+                                    -- TODO: switch to the tag holding
+                                    -- the iceweasel instance, with
+                                    -- shifty configuration ?
                                  end)
              end),
    awful.key({ conf.modkey }, "F4",
-        function ()
-           awful.prompt.run({ prompt = "Run Lua code: " },
-                            conf.screens[mouse.screen].widgets.prompt,
-                            awful.util.eval, nil,
-                            awful.util.getdir("cache") .. "/history_eval")
-        end),
+             function ()
+                awful.prompt.run({ prompt = "Run Lua code: " },
+                                 conf.screens[mouse.screen].widgets.prompt,
+                                 awful.util.eval, nil,
+                                 awful.util.getdir("cache") .. "/history_eval")
+             end),
 
    -- Special keys
    awful.key({ }, "XF86AudioMute", function () awful.util.spawn('amixer -c 0 set Master toggle') end),
@@ -132,9 +160,9 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ }, "XF86AudioNext", function () awful.util.spawn('mpc next') end),
    awful.key({ }, "XF86AudioStop", function () awful.util.spawn('mpc stop ') end),
    awful.key({ }, "XF86AudioPrev", function () awful.util.spawn('mpc prev ') end),
--- awful.key({ }, "XF86Sleep", function () awful.util.spawn('sudo pm-suspend --quirk-dpms-on --quirk-vbestate-restore --quirk-vbemode-restore') end),
--- awful.key({ }, "XF86HomePage", function () awful.util.spawn('sudo cpufreq-set -g ondemand') end),
--- awful.key({ }, "XF86Start", function () awful.util.spawn('sudo cpufreq-set -g powersave') end),
+   -- awful.key({ }, "XF86Sleep", function () awful.util.spawn('sudo pm-suspend --quirk-dpms-on --quirk-vbestate-restore --quirk-vbemode-restore') end),
+   -- awful.key({ }, "XF86HomePage", function () awful.util.spawn('sudo cpufreq-set -g ondemand') end),
+   -- awful.key({ }, "XF86Start", function () awful.util.spawn('sudo cpufreq-set -g powersave') end),
    awful.key({ }, "XF86WWW", function () awful.util.spawn('firefox') end),
    awful.key({ }, "XF86Mail", function () awful.util.spawn('urxvt -e mutt') end),
    awful.key({ }, "XF86Messenger", function () awful.util.spawn('urxvt -e irssi') end)
@@ -154,7 +182,10 @@ conf.bindings.client = awful.util.table.join(
              function (c)
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
-             end)
+             end),
+
+   -- diagnostic
+   awful.key({ conf.modkey, "Shift"   }, 'i', _get_client_info, nil, "client info")
 )
 
 for i = 1, 9 do

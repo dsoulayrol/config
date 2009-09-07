@@ -28,7 +28,6 @@ beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 --     |_ bindings
 --     |     |_ global
 --     |     \_ client
---     |_ layouts
 --     |_ apps
 --     |_ menu
 --     |_ gadgets
@@ -58,27 +57,48 @@ dofile(awful.util.getdir('config') .. '/local.lua')
 -- Default modkey.
 conf.modkey = 'Mod4'
 
--- Table of layouts to cover with awful.layout.inc, order matters.
-conf.layouts = {
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.floating
+-- Shifty configuration.
+
+-- If set to true (default) shifty will attempt to guess new tag name
+-- from client's class. This has effect only when a client is
+-- unmatched and being opened when there's no tags or current tag is
+-- solitary or exclusive.
+shifty.config.guess_name = true
+
+-- If set to true (default) shifty will check first character of a tag
+-- name for being a number and set tag's position according to
+-- that. Providing position explicitly overrides this.
+shifty.config.guess_position = true
+
+-- If set to true (default) shifty will keep track of tag's taglist
+-- index and if closed reopen the tag at the same place. Specifying
+-- position, index or rel_index overrides this.
+shifty.config.remember_index = true
+
+-- If set (to a table of layout functions), enables setting layouts by
+-- short name.
+shifty.config.layouts = {
+   awful.layout.suit.tile,
+   awful.layout.suit.tile.left,
+   awful.layout.suit.tile.bottom,
+   awful.layout.suit.tile.top,
+   awful.layout.suit.fair,
+   awful.layout.suit.fair.horizontal,
+   awful.layout.suit.max,
+   awful.layout.suit.max.fullscreen,
+   awful.layout.suit.magnifier,
+   awful.layout.suit.floating
 }
 
--- Shifty configuration.
 shifty.config.tags = {
-   ["1:Term"] = { init = true, position = 1, screen = 1, mwfact = 0.60        },
-   ["2:Edit"] = { position = 2, spawn = "emacs"                               },
-   ["2:IRC"] = { position = 3, spawn = "xchat"                                },
-   ["3:Net"] = { position = 4, spawn = "iceweasel"   },
-   ["gimp"] = { layout = "floating", icon="/usr/share/pixmaps/gimp.png",      },
+   ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
+   ["2:Edit"] = { spawn = "emacs", layout = "max", exclusive = true,          },
+   ["3:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
+   ["4:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
+   ["gimp"] = { spawn = "gimp", exclusive = true,
+                layout = "max", icon_only = true,
+                icon = "/usr/share/icons/hicolor/16x16/apps/gimp.png",        },
+   ["wire"] = { layout = "tilebottom",                                        },
 }
 
 shifty.config.apps = {
@@ -86,19 +106,30 @@ shifty.config.apps = {
    { match = {"emacs", "emacs-snapshot"        }, tag = "2:Edit",             },
    { match = {"xchat"                          }, tag = "3:IRC",              },
    { match = {"Iceweasel.*", "Firefox.*"       }, tag = "4:Net",              },
-   { match = {"Gimp",                          }, tag = "gimp"                },
-   { match = {"gimp%-image%-window"            }, slave = true,               },
-   { match = {"MPlayer"                        }, float = true,               },
-   { match = { "" }, buttons = {
+   { match = {"wireshark",                     }, tag = "wire"                },
+
+   -- gimp
+   { match = { "Gimp" }, tag = "gimp",                                        },
+   { match = { "gimp.toolbox", "gimp%-image%-window" },
+     slave = true, float = true,                                              },
+
+   -- floats
+   { match = { "MPlayer" }, float = true,                                     },
+
+   -- intrusives
+   { match = { "urxvt", "urxvt-unicode" }, intrusive = true,                  },
+
+   -- bindings
+   { match = { "" }, honorsizehints = false, buttons = {
         button({ }, 1, function (c) client.focus = c; c:raise() end),
         button({ conf.modkey }, 1, function (c) awful.mouse.client.move() end),
-        button({ conf.modkey }, 3, awful.mouse.client.resize ), }, },
+        button({ conf.modkey }, 3, awful.mouse.client.resize ) }              },
 }
 
 shifty.config.defaults = {
    layout = awful.layout.suit.tile,
    ncol = 1,
-   mwfact = 0.60,
+--   mwfact = 0.60,
 }
 
 shifty.init()
@@ -110,24 +141,6 @@ conf.apps = {}
 conf.apps.terminal = 'urxvt -ls'
 conf.apps.editor = os.getenv('EDITOR') or 'vim'
 conf.apps.editor_cmd = conf.apps.terminal .. ' -e ' .. conf.apps.editor
-
--- Table of clients that should be set floating. The index may be either
--- the application class or instance. The instance is useful when running
--- a console app in a terminal like (Music on Console)
---    xterm -name mocp -e mocp
-conf.apps.floats = {
-   -- by class
-   ["MPlayer"] = true,
-   ["gimp"] = true,
-}
-
--- Applications to be moved to a pre-defined tag by class or instance.
--- Use the screen and tags indices.
-conf.apps.tags = {
-   ["Emacs"] = { screen = 1, tag = 2 },
-   ["xchat"] = { screen = 1, tag = 3 },
-   ["Iceweasel"] = { screen = 1, tag = 4 },
-}
 
 -- Menu
 local my_menu = {
@@ -152,37 +165,12 @@ conf.widgets.launcher =
 -- Common widgets
 dofile(awful.util.getdir('config') .. '/gadgets.lua')
 
-
--- -- Default tag properties
--- local tag_names = { '1:Term', '2:Edit', '3:IRC', '4:Net', '5', '6', '7', '8:Wire', '9' }
--- local tag_layouts = {
---    awful.layout.suit.tile,
---    awful.layout.suit.max,
---    awful.layout.suit.tile.bottom,
---    awful.layout.suit.tile.bottom,
---    awful.layout.suit.tile,
---    awful.layout.suit.tile,
---    awful.layout.suit.tile,
---    awful.layout.suit.tile.bottom,
---    awful.layout.suit.tile,
--- }
-
 -- Populate screens
 for s = 1, screen.count() do
    -- Each screen has its own tag table.
    conf.screens[s] = {}
    conf.screens[s].tags = {}
    conf.screens[s].widgets = {}
-
-   -- -- Create 9 tags per screen.
-   -- for tagnumber = 1, 9 do
-   --    conf.screens[s].tags[tagnumber] = tag(tag_names[tagnumber])
-   --    -- Add tags to screen one by one
-   --    conf.screens[s].tags[tagnumber].screen = s
-   --    awful.layout.set(tag_layouts[tagnumber], conf.screens[s].tags[tagnumber])
-   -- end
-   -- -- I'm sure you want to see at least one tag.
-   -- conf.screens[s].tags[1].selected = true
 
    -- Create a promptbox for each screen
    conf.screens[s].widgets.prompt =
@@ -191,10 +179,10 @@ for s = 1, screen.count() do
    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
    conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "left" }
    conf.screens[s].widgets.layout:buttons(
-      { button({ }, 1, function () awful.layout.inc(conf.layouts, 1) end),
-        button({ }, 3, function () awful.layout.inc(conf.layouts, -1) end),
-        button({ }, 4, function () awful.layout.inc(conf.layouts, 1) end),
-        button({ }, 5, function () awful.layout.inc(conf.layouts, -1) end) })
+      { button({ }, 1, function () awful.layout.inc(shifty.config.layouts, 1) end),
+        button({ }, 3, function () awful.layout.inc(shifty.config.layouts, -1) end),
+        button({ }, 4, function () awful.layout.inc(shifty.config.layouts, 1) end),
+        button({ }, 5, function () awful.layout.inc(shifty.config.layouts, -1) end) })
 
    -- Create a taglist widget
    conf.screens[s].widgets.taglist =
@@ -204,8 +192,8 @@ for s = 1, screen.count() do
          button({ conf.modkey }, 1, awful.client.movetotag),
          button({ }, 3, function (tag) tag.selected = not tag.selected end),
          button({ conf.modkey }, 3, awful.client.toggletag),
-          button({ }, 4, awful.tag.viewnext),
-          button({ }, 5, awful.tag.viewprev) }
+         button({ }, 4, awful.tag.viewnext),
+         button({ }, 5, awful.tag.viewprev) }
     )
 
     -- Create the wibox
@@ -233,9 +221,8 @@ for s = 1, screen.count() do
     conf.screens[s].wibox.screen = s
 end
 
--- TODO: this is strange, but shifty.taglist seems to accept the
--- default configuration format only: a table of taglists, indexed by
--- the screen.
+-- shifty.taglist accepts the default configuration format only: a
+-- table of taglists, indexed by the screen.
 shifty.taglist = { conf.screens[1].widgets.taglist }
 
 
