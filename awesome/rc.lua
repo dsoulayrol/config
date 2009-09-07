@@ -7,6 +7,9 @@ require('beautiful')
 -- Notification library
 require('naughty')
 
+-- Dynamic tagging library
+require('shifty')
+
 -- Flaw
 require('flaw')
 
@@ -69,6 +72,37 @@ conf.layouts = {
     awful.layout.suit.floating
 }
 
+-- Shifty configuration.
+shifty.config.tags = {
+   ["1:Term"] = { init = true, position = 1, screen = 1, mwfact = 0.60        },
+   ["2:Edit"] = { position = 2, spawn = "emacs"                               },
+   ["2:IRC"] = { position = 3, spawn = "xchat"                                },
+   ["3:Net"] = { position = 4, spawn = "iceweasel"   },
+   ["gimp"] = { layout = "floating", icon="/usr/share/pixmaps/gimp.png",      },
+}
+
+shifty.config.apps = {
+   { match = { "htop", "Wicd", "jackctl"       }, tag = "1:Term",             },
+   { match = {"emacs", "emacs-snapshot"        }, tag = "2:Edit",             },
+   { match = {"xchat"                          }, tag = "3:IRC",              },
+   { match = {"Iceweasel.*", "Firefox.*"       }, tag = "4:Net",              },
+   { match = {"Gimp",                          }, tag = "gimp"                },
+   { match = {"gimp%-image%-window"            }, slave = true,               },
+   { match = {"MPlayer"                        }, float = true,               },
+   { match = { "" }, buttons = {
+        button({ }, 1, function (c) client.focus = c; c:raise() end),
+        button({ conf.modkey }, 1, function (c) awful.mouse.client.move() end),
+        button({ conf.modkey }, 3, awful.mouse.client.resize ), }, },
+}
+
+shifty.config.defaults = {
+   layout = awful.layout.suit.tile,
+   ncol = 1,
+   mwfact = 0.60,
+}
+
+shifty.init()
+
 -- Application related preferences.
 conf.apps = {}
 
@@ -119,19 +153,19 @@ conf.widgets.launcher =
 dofile(awful.util.getdir('config') .. '/gadgets.lua')
 
 
--- Default tag properties
-local tag_names = { '1:Term', '2:Edit', '3:IRC', '4:Net', '5', '6', '7', '8:Wire', '9' }
-local tag_layouts = {
-   awful.layout.suit.tile,
-   awful.layout.suit.max,
-   awful.layout.suit.tile.bottom,
-   awful.layout.suit.tile.bottom,
-   awful.layout.suit.tile,
-   awful.layout.suit.tile,
-   awful.layout.suit.tile,
-   awful.layout.suit.tile.bottom,
-   awful.layout.suit.tile,
-}
+-- -- Default tag properties
+-- local tag_names = { '1:Term', '2:Edit', '3:IRC', '4:Net', '5', '6', '7', '8:Wire', '9' }
+-- local tag_layouts = {
+--    awful.layout.suit.tile,
+--    awful.layout.suit.max,
+--    awful.layout.suit.tile.bottom,
+--    awful.layout.suit.tile.bottom,
+--    awful.layout.suit.tile,
+--    awful.layout.suit.tile,
+--    awful.layout.suit.tile,
+--    awful.layout.suit.tile.bottom,
+--    awful.layout.suit.tile,
+-- }
 
 -- Populate screens
 for s = 1, screen.count() do
@@ -140,15 +174,15 @@ for s = 1, screen.count() do
    conf.screens[s].tags = {}
    conf.screens[s].widgets = {}
 
-   -- Create 9 tags per screen.
-   for tagnumber = 1, 9 do
-      conf.screens[s].tags[tagnumber] = tag(tag_names[tagnumber])
-      -- Add tags to screen one by one
-      conf.screens[s].tags[tagnumber].screen = s
-      awful.layout.set(tag_layouts[tagnumber], conf.screens[s].tags[tagnumber])
-   end
-   -- I'm sure you want to see at least one tag.
-   conf.screens[s].tags[1].selected = true
+   -- -- Create 9 tags per screen.
+   -- for tagnumber = 1, 9 do
+   --    conf.screens[s].tags[tagnumber] = tag(tag_names[tagnumber])
+   --    -- Add tags to screen one by one
+   --    conf.screens[s].tags[tagnumber].screen = s
+   --    awful.layout.set(tag_layouts[tagnumber], conf.screens[s].tags[tagnumber])
+   -- end
+   -- -- I'm sure you want to see at least one tag.
+   -- conf.screens[s].tags[1].selected = true
 
    -- Create a promptbox for each screen
    conf.screens[s].widgets.prompt =
@@ -198,6 +232,12 @@ for s = 1, screen.count() do
 
     conf.screens[s].wibox.screen = s
 end
+
+-- TODO: this is strange, but shifty.taglist seems to accept the
+-- default configuration format only: a table of taglists, indexed by
+-- the screen.
+shifty.taglist = { conf.screens[1].widgets.taglist }
+
 
 -- Keys and mouse bindings
 dofile(awful.util.getdir('config') .. '/bindings.lua')

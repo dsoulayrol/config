@@ -16,6 +16,25 @@ local tag_keys = {
 --   "parenleft", "minus", "egrave", "underscore", "ccedilla"
 }
 
+-- Local functions
+function _get_tag_info()
+   local t = awful.tag.selected()
+   local v = "<span font_desc=\"Verdana Bold 20\">" .. t.name .. "</span>\n"
+
+   v = v .. tostring(t) .. "\n\n"
+   v = v .. "clients: " .. #t:clients() .. "\n\n"
+
+   local i = 1
+   for op, val in pairs(awful.tag.getdata(t)) do
+      if op == "layout" then val = awful.layout.getname(val) end
+      if op == "keys" then val = '#' .. #val end
+      v = v .. string.format("%2s: %-12s = %s\n", i, op, tostring(val))
+      i = i + 1
+   end
+
+   naughty.notify{ text = v:sub(1,#v-1), timeout = 0, margin = 10 }
+end
+
 -- Mouse bindings
 root.buttons(
    awful.util.table.join(
@@ -67,6 +86,13 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ conf.modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
    awful.key({ conf.modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
    awful.key({ conf.modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
+
+   -- Shifty dedicated bindings.
+   awful.key({ conf.modkey,           }, "t", function() shifty.add({ rel_index = 1 }) end, nil, "new tag"),
+   awful.key({ conf.modkey, "Control" }, "t", function() shifty.add({ rel_index = 1, nopopup = true }) end, nil, "new tag in bg"),
+   awful.key({ conf.modkey,           }, "r", shifty.rename, nil, "tag rename"),
+   awful.key({ conf.modkey,           }, "w", shifty.del, nil, "tag delete"),
+   awful.key({ conf.modkey,           }, 'i', _get_tag_info, nil, "tag info"),
 
    -- Prompt
 --   awful.key({ conf.modkey            }, "F1"   , function () conf.screens[mouse.screen].widgets.prompt:run() end),
@@ -131,54 +157,37 @@ conf.bindings.client = awful.util.table.join(
              end)
 )
 
--- Tags access
--- Compute the maximum number of digit we need, limited to 9
-keynumber = 0
-for s = 1, screen.count() do
-   keynumber = math.min(9, math.max(#conf.screens[s].tags, keynumber))
-end
-
-for i = 1, keynumber do
+for i = 1, 9 do
 conf.bindings.global = awful.util.table.join(conf.bindings.global,
-                                             awful.key({ conf.modkey }, tag_keys[i],
-                                                       function ()
-                                                          local screen = mouse.screen
-                                                          if conf.screens[screen].tags[i] then
-                                                             awful.tag.viewonly(conf.screens[screen].tags[i])
-                                                          end
-                                                       end),
-                                             awful.key({ conf.modkey, "Control" }, tag_keys[i],
-                                                       function ()
-                                                          local screen = mouse.screen
-                                                          if conf.screens[screen].tags[i] then
-                                                             conf.screens[screen].tags[i].selected = not conf.screens[screen].tags[i].selected
-                                                          end
-                                                       end),
-                                             awful.key({ conf.modkey, "Shift" }, tag_keys[i],
-                                                       function ()
-                                                          if client.focus and conf.screens[client.focus.screen].tags[i] then
-                                                             awful.client.movetotag(conf.screens[client.focus.screen].tags[i])
-                                                          end
-                                                       end),
-                                             awful.key({ conf.modkey, "Control", "Shift" }, tag_keys[i],
-                                                       function ()
-                                                          if client.focus and conf.screens[client.focus.screen].tags[i] then
-                                                             awful.client.toggletag(conf.screens[client.focus.screen].tags[i])
-                                                          end
-                                                       end),
-                                             awful.key({ conf.modkey, "Shift" }, "F" .. i,
-                                                       function ()
-                                                          local screen = mouse.screen
-                                                          if conf.screens[screen].tags[i] then
-                                                             for k, c in pairs(awful.client.getmarked()) do
-                                                                awful.client.movetotag(conf.screens[screen].tags[i], c)
-                                                             end
-                                                          end
-                                                       end))
+   awful.key({ conf.modkey }, tag_keys[i],
+             function ()
+                local t = shifty.getpos(i)
+                if t then awful.tag.viewonly(t) end
+             end),
+   awful.key({ conf.modkey, "Control" }, tag_keys[i],
+             function ()
+                local t = shifty.getpos(i)
+                if t then t.selected = not t.selected end
+             end),
+   awful.key({ conf.modkey, "Shift" }, tag_keys[i],
+             function ()
+                local t = shifty.getpos(i)
+                if client.focus and t then
+                   awful.client.movetotag(t)
+                   awful.tag.viewonly(t)
+                end
+             end),
+   awful.key({ conf.modkey, "Control", "Shift" }, tag_keys[i],
+             function ()
+                local t = shifty.getpos(i)
+                if client.focus and t then awful.client.toggletag(t) end
+             end))
 end
 
 -- Set keys
 root.keys(conf.bindings.global)
+shifty.config.globalkeys = conf.bindings.global
+shifty.config.clientkeys = conf.bindings.client
 
 
 -- Client manipulation
