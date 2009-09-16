@@ -3,14 +3,10 @@
 #application/vnd.ms-excel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 #application/msexcel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 
-#text/html; w3m -dump -T text/html %s; copiousoutput
+text/html; w3m -dump -T text/html %s; copiousoutput
 ##text/html; lynx -dump -force_html %s; copiousoutput
 ##text/rtf; unrtf --html '%s' 2>/dev/null | w3m -dump -T text/html ; copiousoutput
 ##text/rtf; catdoc '%s' ; copiousoutput
-
-#text/plain; cat %s; \
-#	test=test "`echo %{charset} | tr '[A-Z]' '[a-z]'`" = iso-8859-1 ; \
-#	copiousoutput
 
 #text/x-sgml; cat %s; copiousoutput
 #text/x-chdr; cat %s; copiousoutput
@@ -33,12 +29,13 @@ text/x-vcard; mutt.vcard.filter; copiousoutput
 #application/x-gzip-compressed; tar tvfz %s; copiousoutput
 
 #application/x-cpio; cpio -tvF --quiet %s; copiousoutput
-#application/x-gtar; tar tvf %s; copiousoutput
 #application/x-tar; tar tvf %s; copiousoutput
 #application/x-tar-gz; tar tvfz %s; copiousoutput
 #application/x-rar-compressed; rar v %s; copiousoutput
 #application/x-zip-compressed; unzip -v %s; copiousoutput
 #application/zip; unzip -v %s; copiousoutput
+application/x-compressed-tar; tar tvf %s; copiousoutput
+application/x-gtar; tar tvfz %s; copiousoutput
 
 #application/x-csh; cat %s; copiousoutput
 #application/x-sh; cat %s; copiousoutput
@@ -53,16 +50,8 @@ text/x-vcard; mutt.vcard.filter; copiousoutput
 #application/x-troff-man; man -l %s 2>/dev/null; copiousoutput
 #application/x-troff-me; groff -me -Tlatin1 %s; copiousoutput
 
+# Rasterized images in the pager, but invoking qiv from attachments view.
+image/*; qiv -tfiR '%s'; test=test "$DISPLAY"
+image/*;  (anytopnm %s | pnmscale -xsize 80 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 ) 2>&1; copiousoutput
 
-#image/*; convert %s:- | jp2a - --width=80 --color; copiousoutput
-#image/jpeg; jp2a %s --width=80 --colors --background=dark ; copiousoutput
-#image/*; anytopnm %s 2> /dev/null | pnmnorm 2> /dev/null | pnmscale -xysize 80 50 | pnmnorm 2> /dev/null | ppmtoansi ; copiousoutput
-#image/*; anytopnm %s 2> /dev/null | pnmscale -xysize 80 50 | ppmtoansi ; copiousoutput
-#image/gif;        anytopnm %s | pnmscale -xsize 80 -ysize 50 | ppmtopgm | pgmtopbm | pbmtoascii ; copiousoutput
-#image/png;        anytopnm %s | pnmscale -xsize 80 -ysize 50 | ppmtopgm | pgmtopbm | pbmtoascii ; copiousoutput
-#image/*; img2txt %s |sed -e 's/$//g';copiousoutput
-
-
-#application/pdf;  pdftohtml -stdout %s | w3m -dump -T text/html; copiousoutput
-
-text/calendar; cat % | ical2rem.pl >> ~/.reminders
+text/calendar; cat %s | ical2rem.pl >> ~/.remind/from_mail

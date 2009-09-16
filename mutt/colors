@@ -79,7 +79,7 @@ color index brightred     black   " ~N ~D"
 
 # spam messages
 color index white         magenta '~h X-Bogosity:\ Spam'
-color index yellow        magenta '~h X-Bogosity:\ Unsure'
+#color index yellow        magenta '~h X-Bogosity:\ Unsure'
 
 # scoring
 #color   index   cyan black              '~n -0'

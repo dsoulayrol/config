@@ -83,8 +83,7 @@ set sort_browser = alpha
 
 # Display of different MIME parts using mailcap entries.
 auto_view text/html text/enriched text/x-vcard
-auto_view application/x-gunzip application/x-tar-gz
-auto_view application/pdf application/postscript image/gif
+auto_view image/*
 
 alternative_order text/enriched text/plain text \
                   application/postscript application/pdf \
@@ -141,8 +140,8 @@ source ~/.mutt/crypto
 set folder = ~/mail
 set spoolfile = +inbox
 set mbox = +inbox
+set record = +inbox
 set postponed = +drafts
-set record = +sent
 
 # Known mailing lists
 source ~/.mutt/mls

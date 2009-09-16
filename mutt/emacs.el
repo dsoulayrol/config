@@ -36,7 +36,7 @@
 
 ;; Typed text replaces the selection if the selection is active
 ;; Also allows to delete (not kill) the highlighted region by pressing <DEL>.
-; (delete-selection-mode t)
+(delete-selection-mode t)
 
 ;; Use % to find the matching paren (as in vi).
 ;;   (http://www.gnu.org/software/emacs/emacs-faq.text)
@@ -55,3 +55,8 @@
 ;; For mail
 ;;(load-library "post")
 (load "~/.config/mutt/post")
+(add-hook 'post-mode-hook
+  (lambda()
+    (auto-fill-mode t)
+    (setq fill-column 72)    ; rfc 1855 for usenet messages
+    (footmode-mode t)))
