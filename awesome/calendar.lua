@@ -1,4 +1,11 @@
--- http://awesome.naquadah.org/wiki/index.php?title=Calendar_widget
+-- From: http://awesome.naquadah.org/wiki/index.php?title=Calendar_widget
+
+require('naughty')
+
+if conf == nil then
+   -- should trace something here...
+   -- perhaps should bind minimal default keys (restart).
+end
 
 function displayMonth(month,year,weekStart)
    local t,wkSt=os.time{year=year, month=month+1, day=0},weekStart or 1
@@ -45,41 +52,44 @@ function switchNaughtyMonth(switchMonths)
    calendar[3].box.widgets[2].text = displayMonth(calendar[1], calendar[2], 2)
 end
 
-mytextbox.mouse_enter = function ()
-                           local month, year = os.date('%m'), os.date('%Y')
-                           calendar = { month, year, 
-                                        naughty.notify({
-                                                          text = displayMonth(month, year, 2),
-                                                          timeout = 0, hover_timeout = 0.5,
-                                                          width = 200, screen = mouse.screen
-                                                       })
-                                     }
-                        end 
-mytextbox.mouse_leave = function () naughty.destroy(calendar[3]) end
+conf.widgets.datebox.mouse_enter = function ()
+  local month, year = os.date('%m'), os.date('%Y')
+  calendar = { month, year,
+               naughty.notify({
+                                 text = displayMonth(month, year, 2),
+                                 timeout = 0, hover_timeout = 0.5,
+                                 width = 200, screen = mouse.screen
+                              })
+            }
+end
 
-mytextbox:buttons({
-                     button({ }, 1, function()
-                                       switchNaughtyMonth(-1)
-                                    end),
-                     button({ }, 3, function()
-                                       switchNaughtyMonth(1)
-                                    end),
-                     button({ }, 4, function()
-                                       switchNaughtyMonth(-1)
-                                    end),
-                     button({ }, 5, function()
-                                       switchNaughtyMonth(1)
-                                    end),
-                     button({ 'Shift' }, 1, function()
-                                               switchNaughtyMonth(-12)
-                                            end),
-                     button({ 'Shift' }, 3, function()
-                                               switchNaughtyMonth(12)
-                                            end),
-                     button({ 'Shift' }, 4, function()
-                                               switchNaughtyMonth(-12)
-                                            end),
-                     button({ 'Shift' }, 5, function()
-                                               switchNaughtyMonth(12)
-                                            end)
-                  })
+conf.widgets.datebox.mouse_leave = function ()
+  naughty.destroy(calendar[3])
+end
+
+conf.widgets.datebox:buttons({
+  button({ }, 1, function()
+                    switchNaughtyMonth(-1)
+                 end),
+  button({ }, 3, function()
+                    switchNaughtyMonth(1)
+                 end),
+  button({ }, 4, function()
+                    switchNaughtyMonth(-1)
+                 end),
+  button({ }, 5, function()
+                    switchNaughtyMonth(1)
+                 end),
+  button({ 'Shift' }, 1, function()
+                            switchNaughtyMonth(-12)
+                         end),
+  button({ 'Shift' }, 3, function()
+                            switchNaughtyMonth(12)
+                         end),
+  button({ 'Shift' }, 4, function()
+                            switchNaughtyMonth(-12)
+                         end),
+  button({ 'Shift' }, 5, function()
+                            switchNaughtyMonth(12)
+                         end)
+})
