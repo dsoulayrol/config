@@ -3,6 +3,7 @@
 -- Grab environment
 local awful = require('awful')
 local beautiful = require('beautiful')
+local util = require("awful.util")
 
 if conf == nil then
    -- should trace something here...
@@ -10,11 +11,26 @@ if conf == nil then
 end
 
 
+-- -- Hook function to execute when client properties change.
+-- awful.hooks.property.register(
+--    function (c)
+--       if c.name and c.screen then
+--          flaw.helper.debug.warn("New property: " .. util.escape(c.name))
+--          conf.screens[c.screen].widgets.wtitle.text =
+--             "<b><small> " .. util.escape(c.name) .. " </small></b>"
+--       end
+--    end)
+
 -- Hook function to execute when focusing a client.
 awful.hooks.focus.register(
    function (c)
       if not awful.client.ismarked(c) then
          c.border_color = beautiful.border_focus
+      end
+      if c.name and c.screen then
+--         flaw.helper.debug.warn("New title: " .. util.escape(c.name))
+         conf.screens[c.screen].widgets.wtitle.text =
+            "<b><small> " .. util.escape(c.name) .. " </small></b>"
       end
    end)
 

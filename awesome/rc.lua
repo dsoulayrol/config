@@ -41,6 +41,7 @@ beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 --           |_ wibox
 --           \_ widgets
 --                |_ layout
+--                |_ window title
 --                |_ prompt
 --                \_ taglist
 
@@ -117,7 +118,8 @@ shifty.config.apps = {
    { match = { "MPlayer" }, float = true,                                     },
 
    -- intrusives
-   { match = { "urxvt", "urxvt-unicode" }, intrusive = true,                  },
+   { match = { "urxvt", "urxvt-unicode" },
+     honorsizehints = true, intrusive = true,                                 },
 
    -- bindings
    { match = { "" }, honorsizehints = false, buttons = {
@@ -173,8 +175,7 @@ for s = 1, screen.count() do
    conf.screens[s].widgets = {}
 
    -- Create a promptbox for each screen
-   conf.screens[s].widgets.prompt =
-      widget{ type = "textbox", align = "left" }
+   conf.screens[s].widgets.prompt = widget{ type = "textbox", align = "left" }
 
    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
    conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "left" }
@@ -183,6 +184,11 @@ for s = 1, screen.count() do
         button({ }, 3, function () awful.layout.inc(shifty.config.layouts, -1) end),
         button({ }, 4, function () awful.layout.inc(shifty.config.layouts, 1) end),
         button({ }, 5, function () awful.layout.inc(shifty.config.layouts, -1) end) })
+
+   -- Create a widget for the active window title.
+   conf.screens[s].widgets.wtitle = widget({ type = "textbox", align = "left" })
+   conf.screens[s].widgets.wtitle.text =
+      "<b><small> " .. awesome.release .. " </small></b>"
 
    -- Create a taglist widget
    conf.screens[s].widgets.taglist =
@@ -205,6 +211,7 @@ for s = 1, screen.count() do
        conf.widgets.launcher,
        conf.screens[s].widgets.taglist,
        conf.screens[s].widgets.layout,
+       conf.screens[s].widgets.wtitle,
        conf.screens[s].widgets.prompt,
        conf.gadgets.cpu_icon.widget,
        conf.gadgets.cpugraph.widget,

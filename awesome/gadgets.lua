@@ -14,7 +14,7 @@ end
 -- Create common widgets
 conf.widgets.systray = widget{ type = "systray", align = "right" }
 conf.widgets.datebox = widget({ type = "textbox", align = "right" })
-conf.widgets.datebox.text = "<b><small> " .. awesome.release .. " </small></b>"
+conf.widgets.datebox.text = os.date(" %a %b %d, %H:%M ")
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.new(
@@ -53,9 +53,7 @@ conf.gadgets.cpugraph = flaw.gadget.new(
 -- conf.widgets.memory_box = flaw.gadget.new('flaw.memory.textbox', '').widget
 
 -- Create battery monitor
-local foo = io.open('/proc/acpi/battery/')
-if foo ~= nil then
-   foo:close()
+if flaw.battery ~= nil then
    conf.gadgets.battery_icon = flaw.gadget.new(
       'flaw.battery.imagebox', conf.param.bat_device,
       {
