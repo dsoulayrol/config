@@ -49,14 +49,14 @@ function switchNaughtyMonth(switchMonths)
    if (#calendar < 3) then return end
    local swMonths = switchMonths or 1
    calendar[1] = calendar[1] + swMonths
-   calendar[3].box.widgets[2].text = displayMonth(calendar[1], calendar[2], 2)
+   calendar[3].box.widgets[2].text = string.format('<span font_desc="%s">%s</span>', "monospace", displayMonth(calendar[1], calendar[2], 2))
 end
 
 conf.widgets.datebox.mouse_enter = function ()
   local month, year = os.date('%m'), os.date('%Y')
   calendar = { month, year,
                naughty.notify({
-                                 text = displayMonth(month, year, 2),
+                                 text = string.format('<span font_desc="%s">%s</span>', "monospace", displayMonth(month, year, 2)),
                                  timeout = 0, hover_timeout = 0.5,
                                  width = 200, screen = mouse.screen
                               })
