@@ -26,8 +26,8 @@ theme.border_marked = "#91231c"
 --taglist_bg_focus = #ff0000
 
 -- Display the taglist squares
-theme.taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.png"
-theme.taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
+-- theme.taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.png"
+-- theme.taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
 
 theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/floatingw.png"
 
