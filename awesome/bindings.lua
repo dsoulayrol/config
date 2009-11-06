@@ -62,6 +62,18 @@ function _get_client_info()
    naughty.notify{ text = v:sub(1,#v-1), timeout = 0, margin = 10 }
 end
 
+function _prompt(cue, exe_cb, completion_cb, cache)
+   local wibox = wibox(
+      { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+   wibox.widgets = { conf.widgets.prompt }
+   wibox.screen = mouse.screen
+
+   awful.prompt.run(
+      { prompt = cue }, conf.widgets.prompt, exec_cb, completion_cb, cache, 50,
+      function() wibox.screen = nil end
+   )
+end
+
 -- Mouse bindings
 root.buttons(
    awful.util.table.join(
@@ -128,28 +140,45 @@ conf.bindings.global = awful.util.table.join(
    -- Prompt
    awful.key({ conf.modkey }, "F1",
              function ()
-                awful.prompt.run({ prompt = "Run: " },
-                                 conf.screens[mouse.screen].widgets.prompt,
-                                 awful.util.spawn, awful.completion.bash,
-                                 awful.util.getdir("cache") .. "/history")
+                local wibox = wibox(
+                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+                wibox.widgets = { conf.widgets.prompt }
+                wibox.screen = mouse.screen
+                awful.prompt.run(
+                   { prompt = "Run: " }, conf.widgets.prompt,
+                   awful.util.spawn, awful.completion.bash,
+                   awful.util.getdir("cache") .. "/history", 50,
+                   function() wibox.screen = nil end
+                )
+             -- TODO: The factored call below doesn't want to work...
+             --    _prompt("Run: ", awful.util.spawn, awful.completion.bash,
+             --            awful.util.getdir("cache") .. "/history")
              end),
    awful.key({ conf.modkey }, "F2",
              function ()
-                awful.prompt.run({ prompt = "Web search: " },
-                                 conf.screens[mouse.screen].widgets.prompt,
-                                 function (command)
-                                    awful.util.spawn("firefox -new-tab 'http://yubnub.org/parser/parse?command=" .. command .. "'", false)
-                                    -- TODO: switch to the tag holding
-                                    -- the iceweasel instance, with
-                                    -- shifty configuration ?
-                                 end)
+                local wibox = wibox(
+                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+                wibox.widgets = { conf.widgets.prompt }
+                wibox.screen = mouse.screen
+                awful.prompt.run(
+                   { prompt = "Web search: " }, conf.widgets.prompt,
+                   function (command)
+                      awful.util.spawn("uzbl 'http://yubnub.org/parser/parse?command=" .. command .. "'", false) end, nil,
+                   nil, 50,
+                   function() wibox.screen = nil end)
              end),
    awful.key({ conf.modkey }, "F4",
+             -- TODO: the wibox doesn't get closed if the Lua expression has an error.
              function ()
-                awful.prompt.run({ prompt = "Run Lua code: " },
-                                 conf.screens[mouse.screen].widgets.prompt,
-                                 awful.util.eval, nil,
-                                 awful.util.getdir("cache") .. "/history_eval")
+                local wibox = wibox(
+                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+                wibox.widgets = { conf.widgets.prompt }
+                wibox.screen = mouse.screen
+                awful.prompt.run(
+                   { prompt = "Run Lua code: " }, conf.widgets.prompt,
+                   awful.util.eval, nil,
+                   awful.util.getdir("cache") .. "/history_eval", 50,
+                   function() wibox.screen = nil end)
              end),
 
    -- Special keys

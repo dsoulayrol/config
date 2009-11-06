@@ -35,6 +35,7 @@ beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 --           |_ launcher
 --           |_ datebox
 --           |_ systray
+--           |_ prompt
 --     |     \_ user defined widgets...
 --     \_ screens
 --           |_ tags
@@ -42,7 +43,6 @@ beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 --           \_ widgets
 --                |_ layout
 --                |_ window title
---                |_ prompt
 --                \_ taglist
 
 conf = {}
@@ -174,11 +174,8 @@ for s = 1, screen.count() do
    conf.screens[s].tags = {}
    conf.screens[s].widgets = {}
 
-   -- Create a promptbox for each screen
-   conf.screens[s].widgets.prompt = widget{ type = "textbox", align = "left" }
-
    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-   conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "left" }
+   conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "right" }
    conf.screens[s].widgets.layout:buttons(
       { button({ }, 1, function () awful.layout.inc(shifty.config.layouts, 1) end),
         button({ }, 3, function () awful.layout.inc(shifty.config.layouts, -1) end),
@@ -210,9 +207,7 @@ for s = 1, screen.count() do
     conf.screens[s].wibox.widgets = {
        conf.widgets.launcher,
        conf.screens[s].widgets.taglist,
-       conf.screens[s].widgets.layout,
        conf.screens[s].widgets.wtitle,
-       conf.screens[s].widgets.prompt,
        conf.gadgets.cpu_icon.widget,
        conf.gadgets.cpugraph.widget,
 --       w_wifi_widget,
@@ -221,8 +216,9 @@ for s = 1, screen.count() do
        conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
        conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
 --       w_sound_widget,
+       conf.widgets.datebox,
        s == 1 and conf.widgets.systray or nil,
-       conf.widgets.datebox
+       conf.screens[s].widgets.layout
     }
 
     conf.screens[s].wibox.screen = s

@@ -15,6 +15,7 @@ end
 conf.widgets.systray = widget{ type = "systray", align = "right" }
 conf.widgets.datebox = widget({ type = "textbox", align = "right" })
 conf.widgets.datebox.text = os.date(" %a %b %d, %H:%M ")
+conf.widgets.prompt = widget{ type = "textbox", align = "left" }
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.new(
@@ -34,7 +35,7 @@ conf.gadgets.cpugraph = flaw.gadget.new(
       max_value = '100' }
 )
 
--- Create network monitor
+-- -- Create network monitor ** BROKEN?
 -- conf.gadgets.netgraph = flaw.gadget.new(
 --    'flaw.network.graph', conf.param.net_device, {}, {
 --       width = '35',
