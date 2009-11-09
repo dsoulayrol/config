@@ -50,6 +50,7 @@ set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
 
 # Calendar (uses wyrd)
 macro generic,pager <f2> "<shell-escape>wyrd<enter>" "Launch wyrd"
+macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.remind/from_mail store\n\<enter-command>set wait_key\n" "Enregistrer l'événement dans le calendrier"
 
 # Mail search (uses maidir-utils)
 macro index <F8> "<shell-escape>rm -rf ~/.mumatch; mu-find -o l -l ~/.mumatch " "mu-find"

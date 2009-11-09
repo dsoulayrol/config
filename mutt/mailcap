@@ -3,7 +3,7 @@
 #application/vnd.ms-excel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 #application/msexcel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 
-text/html; w3m -dump -T text/html %s; copiousoutput
+text/html; w3m -I %{charset} -dump -T text/html %s; copiousoutput
 ##text/html; lynx -dump -force_html %s; copiousoutput
 ##text/rtf; unrtf --html '%s' 2>/dev/null | w3m -dump -T text/html ; copiousoutput
 ##text/rtf; catdoc '%s' ; copiousoutput
@@ -54,4 +54,3 @@ application/x-gtar; tar tvfz %s; copiousoutput
 image/*; qiv -tfiR '%s'; test=test "$DISPLAY"
 image/*;  (anytopnm %s | pnmscale -xsize 80 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 ) 2>&1; copiousoutput
 
-text/calendar; cat %s | ical2rem.pl >> ~/.remind/from_mail
