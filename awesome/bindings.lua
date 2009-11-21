@@ -63,10 +63,10 @@ function _get_client_info()
 end
 
 function _prompt(cue, exe_cb, completion_cb, cache)
-   local wibox = wibox(
+   local wibox = awful.wibox(
       { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
    wibox.widgets = { conf.widgets.prompt }
-   wibox.screen = mouse.screen
+   wibox.attach(mouse.screen)
 
    awful.prompt.run(
       { prompt = cue }, conf.widgets.prompt, exec_cb, completion_cb, cache, 50,
@@ -83,6 +83,7 @@ root.buttons(
 ))
 
 conf.bindings.global = awful.util.table.join(
+   conf.bindings.global,
 
    -- tags
    awful.key({ conf.modkey,           }, "Left",   awful.tag.viewprev       ),
@@ -140,10 +141,10 @@ conf.bindings.global = awful.util.table.join(
    -- Prompt
    awful.key({ conf.modkey }, "F1",
              function ()
-                local wibox = wibox(
-                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+                local wibox = awful.wibox(
+                   { position = "bottom", screen = mouse.screen,
+                     fg = beautiful.fg_normal, bg = beautiful.bg_normal })
                 wibox.widgets = { conf.widgets.prompt }
-                wibox.screen = mouse.screen
                 awful.prompt.run(
                    { prompt = "Run: " }, conf.widgets.prompt,
                    awful.util.spawn, awful.completion.bash,
@@ -156,7 +157,7 @@ conf.bindings.global = awful.util.table.join(
              end),
    awful.key({ conf.modkey }, "F2",
              function ()
-                local wibox = wibox(
+                local wibox = awful.wibox(
                    { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
                 wibox.widgets = { conf.widgets.prompt }
                 wibox.screen = mouse.screen
@@ -170,7 +171,7 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ conf.modkey }, "F4",
              -- TODO: the wibox doesn't get closed if the Lua expression has an error.
              function ()
-                local wibox = wibox(
+                local wibox = awful.wibox(
                    { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
                 wibox.widgets = { conf.widgets.prompt }
                 wibox.screen = mouse.screen
@@ -182,19 +183,22 @@ conf.bindings.global = awful.util.table.join(
              end),
 
    -- Special keys
-   awful.key({ }, "XF86AudioMute", function () awful.util.spawn('amixer -c 0 set Master toggle') end),
-   awful.key({ }, "XF86AudioRaiseVolume", function () awful.util.spawn('amixset +') end),
-   awful.key({ }, "XF86AudioLowerVolume", function () awful.util.spawn('amixset -') end),
-   awful.key({ }, "XF86AudioPlay", function () awful.util.spawn('mpc toggle') end),
-   awful.key({ }, "XF86AudioNext", function () awful.util.spawn('mpc next') end),
-   awful.key({ }, "XF86AudioStop", function () awful.util.spawn('mpc stop ') end),
-   awful.key({ }, "XF86AudioPrev", function () awful.util.spawn('mpc prev ') end),
+   awful.key({ }, "XF86AudioMute",
+             function () awful.util.spawn('amixer -c 0 set Master toggle') end),
+   awful.key({ }, "XF86AudioRaiseVolume",
+             function () awful.util.spawn('amixer -c 0 set Master 5+db') end),
+   awful.key({ }, "XF86AudioLowerVolume",
+             function () awful.util.spawn('amixer -c 0 set Master 5-db') end),
+   awful.key({ }, "XF86AudioPlay", function () awful.util.spawn('xmms2 toggleplay') end),
+   awful.key({ }, "XF86AudioNext", function () awful.util.spawn('xmms2 next') end),
+   awful.key({ }, "XF86AudioStop", function () awful.util.spawn('xmms2 stop ') end),
+   awful.key({ }, "XF86AudioPrev", function () awful.util.spawn('xmms2 prev ') end),
    -- awful.key({ }, "XF86Sleep", function () awful.util.spawn('sudo pm-suspend --quirk-dpms-on --quirk-vbestate-restore --quirk-vbemode-restore') end),
    -- awful.key({ }, "XF86HomePage", function () awful.util.spawn('sudo cpufreq-set -g ondemand') end),
    -- awful.key({ }, "XF86Start", function () awful.util.spawn('sudo cpufreq-set -g powersave') end),
-   awful.key({ }, "XF86WWW", function () awful.util.spawn('firefox') end),
+   awful.key({ }, "XF86WWW", function () awful.util.spawn('iceweasel') end),
    awful.key({ }, "XF86Mail", function () awful.util.spawn('urxvt -e mutt') end),
-   awful.key({ }, "XF86Messenger", function () awful.util.spawn('urxvt -e irssi') end)
+   awful.key({ }, "XF86Messenger", function () awful.util.spawn('xchat') end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then
@@ -243,11 +247,6 @@ conf.bindings.global = awful.util.table.join(conf.bindings.global,
                 if client.focus and t then awful.client.toggletag(t) end
              end))
 end
-
--- Set keys
-root.keys(conf.bindings.global)
-shifty.config.globalkeys = conf.bindings.global
-shifty.config.clientkeys = conf.bindings.client
 
 
 -- Client manipulation

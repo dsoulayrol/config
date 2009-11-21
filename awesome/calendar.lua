@@ -2,16 +2,18 @@
 
 require('naughty')
 
+local datebox = awful.widget.textclock({ align = "right" })
+local calendar = {}
+
 if conf == nil then
-   -- should trace something here...
-   -- perhaps should bind minimal default keys (restart).
+   return datebox
 end
 
-function displayMonth(month,year,weekStart)
+
+function display_month(month,year,weekStart)
    local t,wkSt=os.time{year=year, month=month+1, day=0},weekStart or 1
    local d=os.date("*t",t)
    local mthDays,stDay=d.day,(d.wday-d.day-wkSt+1)%7
-
    local lines = {}
 
    for x=0,6 do
@@ -44,52 +46,49 @@ function displayMonth(month,year,weekStart)
    return header .. table.concat(lines, '\n')
 end
 
-local calendar = {}
-function switchNaughtyMonth(switchMonths)
+function display_calendar()
+   local month, year = os.date('%m'), os.date('%Y')
+   calendar = { month, year,
+                naughty.notify({
+                                  text = string.format('<span font_desc="%s">%s</span>', 'monospace', display_month(month, year, 2)),
+                                  timeout = 0, hover_timeout = 0.5,
+                                  width = 200, screen = mouse.screen
+                               })
+             }
+end
+
+function hide_calendar()
+   naughty.destroy(calendar[3])
+   calendar = {}
+end
+
+function switch_display_calendar()
+   if (#calendar < 3) then display_calendar() else hide_calendar() end
+end
+
+function switch_naughty_month(switchMonths)
    if (#calendar < 3) then return end
    local swMonths = switchMonths or 1
    calendar[1] = calendar[1] + swMonths
-   calendar[3].box.widgets[2].text = string.format('<span font_desc="%s">%s</span>', "monospace", displayMonth(calendar[1], calendar[2], 2))
+   calendar[3].box.widgets[2].text = string.format(
+      '<span font_desc="%s">%s</span>', 'monospace', display_month(calendar[1], calendar[2], 2))
 end
 
-conf.widgets.datebox.mouse_enter = function ()
-  local month, year = os.date('%m'), os.date('%Y')
-  calendar = { month, year,
-               naughty.notify({
-                                 text = string.format('<span font_desc="%s">%s</span>', "monospace", displayMonth(month, year, 2)),
-                                 timeout = 0, hover_timeout = 0.5,
-                                 width = 200, screen = mouse.screen
-                              })
-            }
-end
+datebox:add_signal('mouse::enter', display_calendar)
+datebox:add_signal('mouse::leave', hide_calendar)
+datebox:buttons(
+   awful.util.table.join(
+      awful.button({ }, 1, function() switch_naughty_month(-1) end),
+      awful.button({ }, 3, function() switch_naughty_month(1) end),
+      awful.button({ }, 4, function() switch_naughty_month(-1) end),
+      awful.button({ }, 5, function() switch_naughty_month(1) end),
+      awful.button({ 'Shift' }, 1, function() switch_naughty_month(-12) end),
+      awful.button({ 'Shift' }, 3, function() switch_naughty_month(12) end),
+      awful.button({ 'Shift' }, 4, function() switch_naughty_month(-12) end),
+      awful.button({ 'Shift' }, 5, function() switch_naughty_month(12) end)))
 
-conf.widgets.datebox.mouse_leave = function ()
-  naughty.destroy(calendar[3])
-end
+conf.bindings.global = awful.util.table.join(
+   conf.bindings.global, awful.key({ conf.modkey, }, "c", switch_display_calendar))
 
-conf.widgets.datebox:buttons({
-  button({ }, 1, function()
-                    switchNaughtyMonth(-1)
-                 end),
-  button({ }, 3, function()
-                    switchNaughtyMonth(1)
-                 end),
-  button({ }, 4, function()
-                    switchNaughtyMonth(-1)
-                 end),
-  button({ }, 5, function()
-                    switchNaughtyMonth(1)
-                 end),
-  button({ 'Shift' }, 1, function()
-                            switchNaughtyMonth(-12)
-                         end),
-  button({ 'Shift' }, 3, function()
-                            switchNaughtyMonth(12)
-                         end),
-  button({ 'Shift' }, 4, function()
-                            switchNaughtyMonth(-12)
-                         end),
-  button({ 'Shift' }, 5, function()
-                            switchNaughtyMonth(12)
-                         end)
-})
+
+return datebox

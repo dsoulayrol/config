@@ -10,12 +10,12 @@ if conf == nil then
    -- perhaps should bind minimal default keys (restart).
 end
 
+-- Load local modules
+conf.widgets.datebox = require('calendar')
 
--- Create common widgets
-conf.widgets.systray = widget{ type = "systray", align = "right" }
-conf.widgets.datebox = widget({ type = "textbox", align = "right" })
-conf.widgets.datebox.text = os.date(" %a %b %d, %H:%M ")
-conf.widgets.prompt = widget{ type = "textbox", align = "left" }
+-- Create other common widgets
+conf.widgets.systray = widget{ type = "systray" }
+conf.widgets.prompt = widget{ type = "textbox" }
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.new(
