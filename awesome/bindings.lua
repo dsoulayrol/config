@@ -66,10 +66,10 @@ function _prompt(cue, exe_cb, completion_cb, cache)
    local wibox = awful.wibox(
       { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
    wibox.widgets = { conf.widgets.prompt }
-   wibox.attach(mouse.screen)
-
+   -- wibox.attach(mouse.screen)
+   wibox.screen = mouse.screen
    awful.prompt.run(
-      { prompt = cue }, conf.widgets.prompt, exec_cb, completion_cb, cache, 50,
+      { prompt = cue }, conf.widgets.prompt, exe_cb, completion_cb, cache, 50,
       function() wibox.screen = nil end
    )
 end
@@ -141,45 +141,22 @@ conf.bindings.global = awful.util.table.join(
    -- Prompt
    awful.key({ conf.modkey }, "F1",
              function ()
-                local wibox = awful.wibox(
-                   { position = "bottom", screen = mouse.screen,
-                     fg = beautiful.fg_normal, bg = beautiful.bg_normal })
-                wibox.widgets = { conf.widgets.prompt }
-                awful.prompt.run(
-                   { prompt = "Run: " }, conf.widgets.prompt,
-                   awful.util.spawn, awful.completion.bash,
-                   awful.util.getdir("cache") .. "/history", 50,
-                   function() wibox.screen = nil end
-                )
-             -- TODO: The factored call below doesn't want to work...
-             --    _prompt("Run: ", awful.util.spawn, awful.completion.bash,
-             --            awful.util.getdir("cache") .. "/history")
+                _prompt("Run: ", awful.util.spawn, awful.completion.bash,
+                        awful.util.getdir("cache") .. "/history")
              end),
    awful.key({ conf.modkey }, "F2",
              function ()
-                local wibox = awful.wibox(
-                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
-                wibox.widgets = { conf.widgets.prompt }
-                wibox.screen = mouse.screen
-                awful.prompt.run(
-                   { prompt = "Web search: " }, conf.widgets.prompt,
-                   function (command)
-                      awful.util.spawn("uzbl 'http://yubnub.org/parser/parse?command=" .. command .. "'", false) end, nil,
-                   nil, 50,
-                   function() wibox.screen = nil end)
+                _prompt("Web search: ",
+                        function (command)
+                           awful.util.spawn("uzbl 'http://yubnub.org/parser/parse?command=" .. command .. "'", false) end, nil,
+                        awful.util.getdir("cache") .. "/history_web")
              end),
    awful.key({ conf.modkey }, "F4",
              -- TODO: the wibox doesn't get closed if the Lua expression has an error.
              function ()
-                local wibox = awful.wibox(
-                   { position = "bottom", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
-                wibox.widgets = { conf.widgets.prompt }
-                wibox.screen = mouse.screen
-                awful.prompt.run(
-                   { prompt = "Run Lua code: " }, conf.widgets.prompt,
-                   awful.util.eval, nil,
-                   awful.util.getdir("cache") .. "/history_eval", 50,
-                   function() wibox.screen = nil end)
+                _prompt("Run Lua code: ",
+                        awful.util.eval, nil,
+                        awful.util.getdir("cache") .. "/history_eval")
              end),
 
    -- Special keys
