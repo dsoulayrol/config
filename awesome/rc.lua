@@ -1,14 +1,12 @@
 -- Standard awesome library
 require('awful')
+require('awful.autofocus')
 
 -- Theme handling library
 require('beautiful')
 
 -- Notification library
 require('naughty')
-
--- Dynamic tagging library
-require('shifty')
 
 -- Flaw
 require('flaw')
@@ -48,93 +46,20 @@ beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 conf = {}
 conf.param = {}
 conf.bindings = { global = {}, client = {} }
+conf.layouts = {}
 conf.screens = {}
 conf.gadgets = {}
 conf.widgets = {}
 
--- Load local parameters
-dofile(awful.util.getdir('config') .. '/local.lua')
-
 -- Default modkey.
 conf.modkey = 'Mod4'
 
--- Shifty configuration.
+-- Load local parameters
+dofile(awful.util.getdir('config') .. '/local.lua')
 
--- If set to true (default) shifty will attempt to guess new tag name
--- from client's class. This has effect only when a client is
--- unmatched and being opened when there's no tags or current tag is
--- solitary or exclusive.
-shifty.config.guess_name = true
-
--- If set to true (default) shifty will check first character of a tag
--- name for being a number and set tag's position according to
--- that. Providing position explicitly overrides this.
-shifty.config.guess_position = true
-
--- If set to true (default) shifty will keep track of tag's taglist
--- index and if closed reopen the tag at the same place. Specifying
--- position, index or rel_index overrides this.
-shifty.config.remember_index = true
-
--- If set (to a table of layout functions), enables setting layouts by
--- short name.
-shifty.config.layouts = {
-   awful.layout.suit.tile,
-   awful.layout.suit.tile.left,
-   awful.layout.suit.tile.bottom,
-   awful.layout.suit.tile.top,
-   awful.layout.suit.fair,
-   awful.layout.suit.fair.horizontal,
-   awful.layout.suit.max,
-   awful.layout.suit.max.fullscreen,
-   awful.layout.suit.magnifier,
-   awful.layout.suit.floating
-}
-
-shifty.config.tags = {
-   ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
-   ["2:Edit"] = { spawn = "emacs", layout = "max", exclusive = true,          },
-   ["3:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
-   ["4:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
-   ["gimp"] = { spawn = "gimp", exclusive = true,
-                layout = "max", icon_only = true,
-                icon = "/usr/share/icons/hicolor/16x16/apps/gimp.png",        },
-   ["wire"] = { layout = "tilebottom",                                        },
-}
-
-shifty.config.apps = {
-   { match = { "htop", "Wicd", "jackctl"       }, tag = "1:Term",             },
-   { match = {"emacs", "emacs-snapshot"        }, tag = "2:Edit",             },
-   { match = {"xchat"                          }, tag = "3:IRC",              },
-   { match = {"Iceweasel.*", "Firefox.*"       }, tag = "4:Net",              },
-   { match = {"wireshark",                     }, tag = "wire"                },
-
-   -- gimp
-   { match = { "Gimp" }, tag = "gimp",                                        },
-   { match = { "gimp.toolbox", "gimp%-image%-window" },
-     slave = true, float = true,                                              },
-
-   -- floats
-   { match = { "MPlayer" }, float = true,                                     },
-
-   -- intrusives
-   { match = { "urxvt", "urxvt-unicode" },
-     honorsizehints = true, intrusive = true,                                 },
-
-   -- bindings
-   { match = { "" }, honorsizehints = false, buttons = {
-        button({ }, 1, function (c) client.focus = c; c:raise() end),
-        button({ conf.modkey }, 1, function (c) awful.mouse.client.move() end),
-        button({ conf.modkey }, 3, awful.mouse.client.resize ) }              },
-}
-
-shifty.config.defaults = {
-   layout = awful.layout.suit.tile,
-   ncol = 1,
---   mwfact = 0.60,
-}
-
-shifty.init()
+-- Shifty configuration - Dynamic tagging library
+require("shifty_configuration")
+conf.layouts = shifty.config.layouts
 
 -- Application related preferences.
 conf.apps = {}
@@ -175,59 +100,63 @@ for s = 1, screen.count() do
    conf.screens[s].widgets = {}
 
    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-   conf.screens[s].widgets.layout = widget{ type = "imagebox", align = "right" }
+   conf.screens[s].widgets.layout = awful.widget.layoutbox(s)
    conf.screens[s].widgets.layout:buttons(
-      { button({ }, 1, function () awful.layout.inc(shifty.config.layouts, 1) end),
-        button({ }, 3, function () awful.layout.inc(shifty.config.layouts, -1) end),
-        button({ }, 4, function () awful.layout.inc(shifty.config.layouts, 1) end),
-        button({ }, 5, function () awful.layout.inc(shifty.config.layouts, -1) end) })
+      awful.util.table.join(
+         awful.button({ }, 1, function () awful.layout.inc(conf.layouts.layouts, 1) end),
+         awful.button({ }, 3, function () awful.layout.inc(conf.layouts.layouts, -1) end),
+         awful.button({ }, 4, function () awful.layout.inc(conf.layouts.layouts, 1) end),
+         awful.button({ }, 5, function () awful.layout.inc(conf.layouts.layouts, -1) end)))
 
    -- Create a widget for the active window title.
-   conf.screens[s].widgets.wtitle = widget({ type = "textbox", align = "left" })
+   conf.screens[s].widgets.wtitle = widget({ type = "textbox" })
    conf.screens[s].widgets.wtitle.text =
       "<b><small> " .. awesome.release .. " </small></b>"
 
    -- Create a taglist widget
    conf.screens[s].widgets.taglist =
-      awful.widget.taglist.new(
-      s, awful.widget.taglist.label.all, {
-         button({ }, 1, awful.tag.viewonly),
-         button({ conf.modkey }, 1, awful.client.movetotag),
-         button({ }, 3, function (tag) tag.selected = not tag.selected end),
-         button({ conf.modkey }, 3, awful.client.toggletag),
-         button({ }, 4, awful.tag.viewnext),
-         button({ }, 5, awful.tag.viewprev) }
-    )
+      awful.widget.taglist(
+      s, awful.widget.taglist.label.all,
+      awful.util.table.join(
+         awful.button({ }, 1, awful.tag.viewonly),
+         awful.button({ conf.modkey }, 1, awful.client.movetotag),
+         awful.button({ }, 3, function (tag) tag.selected = not tag.selected end),
+         awful.button({ conf.modkey }, 3, awful.client.toggletag),
+         awful.button({ }, 4, awful.tag.viewnext),
+         awful.button({ }, 5, awful.tag.viewprev)))
 
     -- Create the wibox
     conf.screens[s].wibox =
-       wibox({ position = "top", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+       awful.wibox({ position = "top", screen = s,
+                     fg = beautiful.fg_normal, bg = beautiful.bg_normal })
 
     -- Add widgets to the wibox - order matters
     conf.screens[s].wibox.widgets = {
-       conf.widgets.launcher,
-       conf.screens[s].widgets.taglist,
-       conf.screens[s].widgets.wtitle,
-       conf.gadgets.cpu_icon.widget,
-       conf.gadgets.cpugraph.widget,
---       w_wifi_widget,
-       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
-       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
-       conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
-       conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
---       w_sound_widget,
-       conf.widgets.datebox,
-       s == 1 and conf.widgets.systray or nil,
-       conf.screens[s].widgets.layout
-    }
+       {
+          conf.widgets.launcher,
+          conf.screens[s].widgets.taglist,
+          conf.screens[s].widgets.wtitle,
+          layout = awful.widget.layout.horizontal.leftright
+       },
 
-    conf.screens[s].wibox.screen = s
+       conf.screens[s].widgets.layout,
+       conf.widgets.datebox,
+       conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
+       conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
+       conf.gadgets.cpugraph.widget,
+       conf.gadgets.cpu_icon.widget,
+--       w_wifi_widget,
+       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
+       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
+--       w_sound_widget,
+       s == 1 and conf.widgets.systray or nil,
+       layout = awful.widget.layout.horizontal.rightleft
+    }
 end
 
 -- shifty.taglist accepts the default configuration format only: a
 -- table of taglists, indexed by the screen.
 shifty.taglist = { conf.screens[1].widgets.taglist }
-
 
 -- Keys and mouse bindings
 dofile(awful.util.getdir('config') .. '/bindings.lua')
@@ -238,5 +167,9 @@ dofile(awful.util.getdir('config') .. '/hooks.lua')
 -- Load local modules
 -- These modules can rely on the full configuration, so they must be
 -- loaded late.
-require('calendar')
 require('sweep_mouse')
+
+-- Now that everything is loaded, set bindings.
+root.keys(conf.bindings.global)
+shifty.config.globalkeys = conf.bindings.global
+shifty.config.clientkeys = conf.bindings.client
