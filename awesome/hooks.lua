@@ -10,40 +10,61 @@ if conf == nil then
    -- perhaps should bind minimal default keys (restart).
 end
 
+function update_title(c)
+   if c and c.name and c.screen then
+      conf.screens[c.screen].widgets.wtitle.text =
+         "<b><small> " .. util.escape(c.name) .. " </small></b>"
+   end
+end
 
--- Hook function to execute when client properties change.
+function reset_title(c)
+   if c and c.screen then
+      conf.screens[c.screen].widgets.wtitle.text = ""
+   end
+end
+
 client.add_signal(
-   'property::name',
-   function (c)
-      flaw.helper.debug.warn("* DEBUG* Signal name raised!")
+   'manage',
+   function (c, startup)
+      -- Register name changes for the title widget.
+      c:add_signal('property::name', update_title)
+
+      -- Enable sloppy focus.
+      c:add_signal(
+         'mouse::enter',
+         function(c)
+            if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+            and awful.client.focus.filter(c) then
+            client.focus = c
+         end
+      end)
+
+      if not startup then
+         -- Set the windows at the slave,
+         -- i.e. put it at the end of others instead of setting it master.
+         -- awful.client.setslave(c)
+
+         -- Put windows in a smart way, only if they does not set an initial position.
+         if not c.size_hints.user_position and not c.size_hints.program_position then
+            awful.placement.no_overlap(c)
+            awful.placement.no_offscreen(c)
+         end
+      end
    end)
 
 -- Hook function to execute when focusing a client.
 client.add_signal(
    'focus',
    function(c)
-      -- flaw.helper.debug.warn("* DEBUG* Signal focus raised!")
       c.border_color = beautiful.border_focus
-      if c.name and c.screen then
-         conf.screens[c.screen].widgets.wtitle.text =
-            "<b><small> " .. util.escape(c.name) .. " </small></b>"
-      end
+      update_title(c)
+      c.opacity = 0.9
    end)
 
 client.add_signal(
    'unfocus',
    function(c)
       c.border_color = beautiful.border_normal
-      conf.screens[c.screen].widgets.wtitle.text = ""
-   end)
-
--- Hook function to execute when the mouse enters a client.
-client.add_signal(
-   'mouse::enter',
-   function (c)
-      -- Sloppy focus, but disabled for magnifier layout
-      if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-         and awful.client.focus.filter(c) then
-         client.focus = c
-      end
+      reset_title(c)
+      c.opacity = 0.4
    end)
