@@ -43,7 +43,7 @@ set query_command="lbdbq '%s'"
 set edit_headers
 
 # Use a special instance of emacs to write mails.
-set editor = "emacs -nw --no-splash --no-init-file --load ~/.mutt/emacs"
+set editor = "emacsclient -t"
 
 # Mailcap preferences
 set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
@@ -55,6 +55,9 @@ macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.
 # Mail search (uses maidir-utils)
 macro index <F8> "<shell-escape>rm -rf ~/.mumatch; mu-find -o l -l ~/.mumatch " "mu-find"
 macro index <F9> "<change-folder-readonly>~/.mumatch" "display mu-find results"
+
+# Forwarding attachments.
+set mime_forward = ask-no
 
 # Printing
 set print_command="muttprint"

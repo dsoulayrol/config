@@ -36,9 +36,8 @@ shifty.config.layouts = {
 
 shifty.config.tags = {
    ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
-   ["2:Edit"] = { spawn = "emacs", layout = "max", exclusive = true,          },
-   ["3:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
-   ["4:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
+   ["2:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
+   ["3:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
    ["gimp"] = { spawn = "gimp", exclusive = true,
                 layout = "max", icon_only = true,
                 icon = "/usr/share/icons/hicolor/16x16/apps/gimp.png",        },
@@ -47,9 +46,8 @@ shifty.config.tags = {
 
 shifty.config.apps = {
    { match = { "htop", "Wicd", "jackctl"       }, tag = "1:Term",             },
-   { match = {"emacs", "emacs-snapshot"        }, tag = "2:Edit",             },
-   { match = {"xchat"                          }, tag = "3:IRC",              },
-   { match = {"Iceweasel.*", "Firefox.*"       }, tag = "4:Net",              },
+   { match = {"xchat"                          }, tag = "2:IRC",              },
+   { match = {"Iceweasel.*", "Firefox.*"       }, tag = "3:Net",              },
    { match = {"wireshark",                     }, tag = "wire"                },
 
    -- gimp
@@ -58,7 +56,7 @@ shifty.config.apps = {
      slave = true, float = true,                                              },
 
    -- floats
-   { match = { "MPlayer" }, float = true,                                     },
+   { match = { "MPlayer" }, float = true, ontop = true                        },
 
    -- intrusives
    { match = { "urxvt", "urxvt-unicode" },
