@@ -69,9 +69,9 @@ color index cyan          black   "~C \"(root|postmaster|mailer-daemon)@\" !~N !
 color index brightcyan    black   "~C \"(root|postmaster|mailer-daemon)@\"  ~N !~P !~p"
 
 # big messages
-color index magenta       black   "!~N                ~z 102400-"
-color index magenta       cyan    "    ~T !~F !~p !~P ~z 102400-"
-color index brightmagenta black   " ~N                ~z 102400-"
+#color index magenta       black   "!~N                ~z 102400-"
+#color index magenta       cyan    "    ~T !~F !~p !~P ~z 102400-"
+#color index brightmagenta black   " ~N                ~z 102400-"
 
 # deleted messages
 color index red           black   "!~N ~D"

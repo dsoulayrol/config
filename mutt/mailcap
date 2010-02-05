@@ -1,5 +1,5 @@
-#application/ms-word; antiword '%s' ; copiousoutput
-#application/msword; antiword '%s' ; copiousoutput
+application/ms-word; antiword '%s' ; copiousoutput
+application/msword; antiword '%s' ; copiousoutput
 #application/vnd.ms-excel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 #application/msexcel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput
 
@@ -28,14 +28,14 @@ text/x-vcard; mutt.vcard.filter; copiousoutput
 #application/x-bzip2; bzcat |less; needsterminal
 #application/x-gzip-compressed; tar tvfz %s; copiousoutput
 
-#application/x-cpio; cpio -tvF --quiet %s; copiousoutput
-#application/x-tar; tar tvf %s; copiousoutput
-#application/x-tar-gz; tar tvfz %s; copiousoutput
-#application/x-rar-compressed; rar v %s; copiousoutput
-#application/x-zip-compressed; unzip -v %s; copiousoutput
-#application/zip; unzip -v %s; copiousoutput
+application/x-cpio; cpio -tvF --quiet %s; copiousoutput
+application/x-tar; tar tvf %s; copiousoutput
+application/x-tar-gz; tar tvfz %s; copiousoutput
 application/x-compressed-tar; tar tvf %s; copiousoutput
 application/x-gtar; tar tvfz %s; copiousoutput
+#application/x-rar-compressed; rar v %s; copiousoutput
+application/x-zip-compressed; unzip -v %s; copiousoutput
+application/zip; unzip -v %s; copiousoutput
 
 #application/x-csh; cat %s; copiousoutput
 #application/x-sh; cat %s; copiousoutput
