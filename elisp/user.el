@@ -78,8 +78,7 @@
 
 ;; Yasnippet
 ;; ---------
-;; TODO: should not hard write src/elisp here.
-(setq yas/root-directory '("~/src/elisp/snippets"
+(setq yas/root-directory '("~/.config/elisp/snippets"
                            "/usr/share/emacs/site-lisp/yasnippet/snippets/"))
 
 ;; Map `yas/load-directory' to every element
