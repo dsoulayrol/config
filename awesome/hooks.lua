@@ -58,7 +58,7 @@ client.add_signal(
    function(c)
       c.border_color = beautiful.border_focus
       update_title(c)
-      c.opacity = 0.9
+      c.opacity = 1
    end)
 
 client.add_signal(

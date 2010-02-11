@@ -175,7 +175,8 @@ conf.bindings.global = awful.util.table.join(
    -- awful.key({ }, "XF86Start", function () awful.util.spawn('sudo cpufreq-set -g powersave') end),
    awful.key({ }, "XF86WWW", function () awful.util.spawn('iceweasel') end),
    awful.key({ }, "XF86Mail", function () awful.util.spawn('urxvt -e mutt') end),
-   awful.key({ }, "XF86Messenger", function () awful.util.spawn('xchat') end)
+   awful.key({ }, "XF86Messenger", function () awful.util.spawn('xchat') end),
+   awful.key({ conf.modkey }, "#127", function () awful.util.spawn('xmms2 toggleplay') end)
 )
 
 -- Client awful tagging: this is useful to tag some clients and then
@@ -192,6 +193,21 @@ conf.bindings.client = awful.util.table.join(
              function (c)
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
+             end),
+
+   -- opacity
+   awful.key({ conf.modkey,           }, "Prior",
+             function (c)
+                if c.opacity < 1.0 then
+                      c.opacity = c.opacity + 0.1
+                end
+             end),
+
+   awful.key({ conf.modkey,           }, "Next",
+             function (c)
+                if c.opacity > 0.1 then
+                      c.opacity = c.opacity - 0.1
+                end
              end),
 
    -- diagnostic
