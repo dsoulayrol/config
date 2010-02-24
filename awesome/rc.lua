@@ -103,10 +103,10 @@ for s = 1, screen.count() do
    conf.screens[s].widgets.layout = awful.widget.layoutbox(s)
    conf.screens[s].widgets.layout:buttons(
       awful.util.table.join(
-         awful.button({ }, 1, function () awful.layout.inc(conf.layouts.layouts, 1) end),
-         awful.button({ }, 3, function () awful.layout.inc(conf.layouts.layouts, -1) end),
-         awful.button({ }, 4, function () awful.layout.inc(conf.layouts.layouts, 1) end),
-         awful.button({ }, 5, function () awful.layout.inc(conf.layouts.layouts, -1) end)))
+         awful.button({ }, 1, function () awful.layout.inc(conf.layouts, 1) end),
+         awful.button({ }, 3, function () awful.layout.inc(conf.layouts, -1) end),
+         awful.button({ }, 4, function () awful.layout.inc(conf.layouts, 1) end),
+         awful.button({ }, 5, function () awful.layout.inc(conf.layouts, -1) end)))
 
    -- Create a widget for the active window title.
    conf.screens[s].widgets.wtitle = widget({ type = "textbox" })
