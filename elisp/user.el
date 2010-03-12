@@ -62,6 +62,36 @@
 (add-hook 'c-mode-hook 'gtags-mode)
 
 
+;; Buffers Management
+;; ------------------
+;; IBuffer
+(setq ibuffer-saved-filter-groups
+  (quote (("default"
+            ("Org"
+              (mode . org-mode))
+            ("Programming"
+              (or
+                (mode . c-mode)
+                (mode . c++-mode)
+                (mode . perl-mode)
+                (mode . python-mode)
+                (mode . emacs-lisp-mode)
+                ))
+            ("Web"
+              (or
+                (mode . xhtml-mode)
+                (mode . jabascript-mode)
+                ))
+            ))))
+
+(add-hook 'ibuffer-mode-hook
+  (lambda ()
+    (ibuffer-switch-to-saved-filter-groups "default")))
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; Midnight
+(require 'midnight)
+
 
 ;; Mutt
 ;; ----
@@ -75,6 +105,9 @@
     (setq fill-column 72) ; rfc 1855 for usenet messages
     (footmode-mode t)))
 
+;; Address Book (http://savannah.nongnu.org/projects/addressbook/)
+;; ------------
+(require 'abook "addressbook/abook.el" 'noerror)
 
 ;; Yasnippet
 ;; ---------
@@ -109,11 +142,7 @@ it)"
        (cons 'show-fly-err-at-point post-command-hook)))
 
 
-
 (load-user-elisp "dist/elisp/sacha.el")
-
-
-(load-user-elisp "local/elisp/user-cedet.el")
 (load-user-elisp "local/elisp/user-org.el")
 
 ;; Programming Modes
