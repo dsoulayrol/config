@@ -10,8 +10,9 @@
 (add-hook 'find-file-hook
           '(lambda ()
 	     "Show trailing spaces and empty lines on every buffer"
-             (setq show-trailing-whitespace t)
-             (setq indicate-empty-lines t)))
+             (setq show-trailing-whitespace t
+                   indicate-empty-lines t
+                   default-indicate-buffer-boundaries 'left)))
 
 
 ;; Typed text replaces the selection if the selection is active
@@ -103,7 +104,9 @@
   (lambda()
     (auto-fill-mode t)
     (setq fill-column 72) ; rfc 1855 for usenet messages
-    (footmode-mode t)))
+    (if (require 'footnote nil t) (footnote-mode t)))
+    (if (require 'flyspell nil t) (flyspell-mode t)))
+
 
 ;; Address Book (http://savannah.nongnu.org/projects/addressbook/)
 ;; ------------

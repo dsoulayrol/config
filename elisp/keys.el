@@ -8,13 +8,6 @@
         ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
         (t (self-insert-command (or arg 1)))))
 
-;; Folding
-(global-set-key "\C-c=" 'hs-toggle-hiding)
-(global-set-key "\C-c-" 'hs-hide-block)
-(global-set-key "\C-c\e-" 'hs-hide-all)
-(global-set-key "\C-c+" 'hs-show-block)
-(global-set-key "\C-c\e+" 'hs-show-all)
-
 ;; GTags (M-. and M-* already defined in gtags.el)
 (global-set-key "\e," 'gtags-find-rtag)
 

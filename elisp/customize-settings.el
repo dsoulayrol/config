@@ -18,6 +18,7 @@
  '(lazy-highlight-max-at-a-time nil)
  '(org-agenda-files (quote ("~/doc/org/memo.org" "~/doc/org/tasks.org")))
  '(show-paren-mode t nil (paren))
+ '(sml-modeline-borders nil)
  '(transient-mark-mode t)
  '(truncate-lines 1))
 
@@ -26,4 +27,5 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- )
+ '(sml-modeline-end-face ((t (:inherit match))))
+ '(sml-modeline-vis-face ((t (:background "grey30" :foreground "white")))))
