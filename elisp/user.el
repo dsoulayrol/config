@@ -57,10 +57,10 @@
 
 ;; GNU Global
 ;;   (http://www.gnu.org/software/global/globaldoc.html)
-(load-library "global/gtags.el")
-(add-hook 'java-mode-hook 'gtags-mode)
-(add-hook 'c++-mode-hook 'gtags-mode)
-(add-hook 'c-mode-hook 'gtags-mode)
+(when (require 'global "global/gtags.el" 'noerror)
+  (add-hook 'java-mode-hook 'gtags-mode)
+  (add-hook 'c++-mode-hook 'gtags-mode)
+  (add-hook 'c-mode-hook 'gtags-mode))
 
 
 ;; Buffers Management
@@ -104,8 +104,8 @@
   (lambda()
     (auto-fill-mode t)
     (setq fill-column 72) ; rfc 1855 for usenet messages
-    (if (require 'footnote nil t) (footnote-mode t)))
-    (if (require 'flyspell nil t) (flyspell-mode t)))
+    (if (require 'footnote nil 'noerror) (footnote-mode t)))
+    (if (require 'flyspell nil 'noerror) (flyspell-mode t)))
 
 
 ;; Address Book (http://savannah.nongnu.org/projects/addressbook/)
@@ -114,11 +114,11 @@
 
 ;; Yasnippet
 ;; ---------
-(setq yas/root-directory '("~/.config/elisp/snippets"
-                           "/usr/share/emacs/site-lisp/yasnippet/snippets/"))
-
-;; Map `yas/load-directory' to every element
-(mapc 'yas/load-directory yas/root-directory)
+(when (require 'yasnippet nil 'noerror)
+  (setq yas/root-directory '("~/.config/elisp/snippets"
+                             "/usr/share/emacs/site-lisp/yasnippet/snippets/"))
+  ;; Map `yas/load-directory' to every element
+  (mapc 'yas/load-directory yas/root-directory))
 
 
 ;; Flymake
