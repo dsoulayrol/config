@@ -57,6 +57,7 @@ shifty.config.apps = {
 
    -- floats
    { match = { "MPlayer" }, float = true, ontop = true                        },
+   { match = { "Wine" }, float = true                                         },
 
    -- intrusives
    { match = { "urxvt", "urxvt-unicode" },
