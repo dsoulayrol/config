@@ -141,13 +141,13 @@ for s = 1, screen.count() do
 
        conf.screens[s].widgets.layout,
        conf.widgets.datebox,
+       conf.gadgets.gmail and conf.gadgets.gmail.widget or nil,
        conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
        conf.gadgets.cpugraph.widget,
        conf.gadgets.cpu_icon.widget,
---       w_wifi_widget,
-       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
-       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
+--       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
+--       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
 --       w_sound_widget,
        s == 1 and conf.widgets.systray or nil,
        layout = awful.widget.layout.horizontal.rightleft

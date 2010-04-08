@@ -17,6 +17,13 @@ conf.widgets.datebox = require('calendar')
 conf.widgets.systray = widget{ type = "systray" }
 conf.widgets.prompt = widget{ type = "textbox" }
 
+-- GMail
+conf.gadgets.gmail = flaw.gadget.new(
+   'flaw.gmail.textbox', '',
+   { pattern = ' GMail: <span color="#ffffff">$count</span> |' } )
+conf.gadgets.gmail:set_tooltip(
+   'Unread messages\n<span color="#ffffff">$mails</span>')
+
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.new(
    'flaw.cpu.imagebox', 'cpu', {},
