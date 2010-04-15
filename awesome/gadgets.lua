@@ -2,6 +2,7 @@
 
 -- Grab environment
 local awful = require('awful')
+local flaw = require('flaw')
 local beautiful = require('beautiful')
 local io = require('io')
 
@@ -18,40 +19,29 @@ conf.widgets.systray = widget{ type = "systray" }
 conf.widgets.prompt = widget{ type = "textbox" }
 
 -- GMail
-conf.gadgets.gmail = flaw.gadget.new(
-   'flaw.gmail.textbox', '',
-   { pattern = ' GMail: <span color="#ffffff">$count</span> |' } )
-conf.gadgets.gmail:set_tooltip(
-   'Unread messages\n<span color="#ffffff">$mails</span>')
+conf.gadgets.gmail = flaw.gadget.GMailTextbox(
+   '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> |' })
+conf.gadgets.gmail:set_tooltip('Unread messages at $timestamp:\n$mails')
 
 -- Create CPU, CPUfreq monitor
-conf.gadgets.cpu_icon = flaw.gadget.new(
-   'flaw.cpu.imagebox', 'cpu', {},
-   {
-      image = image(beautiful.icon_cpu)
-   }
-)
+conf.gadgets.cpu_icon = flaw.gadget.CPUIcon(
+   'cpu', {}, { image = image(beautiful.icon_cpu) })
 
-conf.gadgets.cpugraph = flaw.gadget.new(
-   'flaw.cpu.graph', 'cpu', {}, {
-      width = '35',
-      height = '0.8',
-      grow = 'right',
-      bg = beautiful.bg_normal,
-      fg = beautiful.fg_normal,
-      max_value = '100' }
-)
+conf.gadgets.cpu_graph = flaw.gadget.CPUGraph(
+   'cpu', {}, { width = 35, height = 18 })
+conf.gadgets.cpu_graph.hull:set_color(beautiful.fg_normal)
+conf.gadgets.cpu_graph.hull:set_border_color(beautiful.fg_normal)
+conf.gadgets.cpu_graph.hull:set_background_color(beautiful.bg_normal)
 
--- -- Create network monitor ** BROKEN?
--- conf.gadgets.netgraph = flaw.gadget.new(
---    'flaw.network.graph', conf.param.net_device, {}, {
---       width = '35',
---       height = '0.8',
---       grow = 'right',
---       bg = beautiful.bg_normal,
---       fg = beautiful.fg_normal,
---       max_value = '100000' }
--- )
+-- Create network monitor
+conf.gadgets.net_icon = flaw.gadget.NetIcon(
+   conf.param.net_device, {}, { image = image(beautiful.icon_net) })
+
+conf.gadgets.net_graph = flaw.gadget.NetGraph(
+   conf.param.net_device, {}, { width = 35, height = 18 })
+conf.gadgets.net_graph.hull:set_color(beautiful.fg_normal)
+conf.gadgets.net_graph.hull:set_border_color(beautiful.fg_normal)
+conf.gadgets.net_graph.hull:set_background_color(beautiful.bg_normal)
 
 -- For tests only
 -- conf.gadgets.netbox = flaw.gadget.new(
@@ -62,8 +52,8 @@ conf.gadgets.cpugraph = flaw.gadget.new(
 
 -- Create battery monitor
 if flaw.battery ~= nil then
-   conf.gadgets.battery_icon = flaw.gadget.new(
-      'flaw.battery.imagebox', conf.param.bat_device,
+   conf.gadgets.battery_icon = flaw.gadget.BatteryIcon(
+      conf.param.bat_device,
       {
          my_icons = {
             image(beautiful.icon_battery_low),
@@ -107,9 +97,9 @@ if flaw.battery ~= nil then
             bg = beautiful.bg_focus} end
    )
 
-   conf.gadgets.battery_box = flaw.gadget.new(
-      'flaw.battery.textbox', conf.param.bat_device,
-      { pattern = '<span color="#99aa99">$load</span>% $time' } )
+   conf.gadgets.battery_box = flaw.gadget.BatteryTextbox(
+      conf.param.bat_device,
+      { pattern = '<span color="#99aa99">$load</span>% $time' })
    conf.gadgets.battery_box:add_event(
       flaw.event.LatchTrigger:new{condition = function(d) return d.load < 60 end },
       function(g) g.pattern = '<span color="#ffffff">$load</span>%' end

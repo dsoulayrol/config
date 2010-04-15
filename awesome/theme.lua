@@ -90,5 +90,6 @@ theme.icon_battery_mid = awful.util.getdir('config') .. "/icons/battery_mid.png"
 theme.icon_battery_low = awful.util.getdir('config') .. "/icons/battery_low.png"
 theme.icon_battery_plugged = awful.util.getdir('config') .. "/icons/battery_plugged.png"
 theme.icon_cpu = awful.util.getdir('config') .. "/icons/cpu.png"
+theme.icon_net = awful.util.getdir('config') .. "/icons/net.png"
 
 return theme

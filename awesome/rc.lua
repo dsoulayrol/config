@@ -4,6 +4,7 @@ require('awful.autofocus')
 
 -- Theme handling library
 require('beautiful')
+beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 
 -- Notification library
 require('naughty')
@@ -14,8 +15,6 @@ require('flaw')
 -- Load Debian menu entries
 require("debian.menu")
 
--- Load theme
-beautiful.init(awful.util.getdir('config') .. '/theme.lua')
 
 -- Variable definitions
 
@@ -141,14 +140,13 @@ for s = 1, screen.count() do
 
        conf.screens[s].widgets.layout,
        conf.widgets.datebox,
-       conf.gadgets.gmail and conf.gadgets.gmail.widget or nil,
+       conf.gadgets.gmail.widget,
        conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
-       conf.gadgets.cpugraph.widget,
+       conf.gadgets.net_graph.widget,
+       conf.gadgets.net_icon.widget,
+       conf.gadgets.cpu_graph.widget,
        conf.gadgets.cpu_icon.widget,
---       conf.gadgets.netbox and conf.gadgets.netbox.widget or nil,
---       conf.gadgets.netgraph and conf.gadgets.netgraph.widget or nil,
---       w_sound_widget,
        s == 1 and conf.widgets.systray or nil,
        layout = awful.widget.layout.horizontal.rightleft
     }
@@ -173,3 +171,5 @@ require('sweep_mouse')
 root.keys(conf.bindings.global)
 shifty.config.globalkeys = conf.bindings.global
 shifty.config.clientkeys = conf.bindings.client
+
+flaw.check_modules()
