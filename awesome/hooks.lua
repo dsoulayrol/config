@@ -11,7 +11,7 @@ if conf == nil then
 end
 
 function update_title(c)
-   if c and c.name and c.screen then
+   if c and c.name and c.screen and client.focus == c then
       conf.screens[c.screen].widgets.wtitle.text =
          "<b><small> " .. util.escape(c.name) .. " </small></b>"
    end
@@ -40,11 +40,12 @@ client.add_signal(
       end)
 
       if not startup then
-         -- Set the windows at the slave,
-         -- i.e. put it at the end of others instead of setting it master.
+         -- Put the window at the end of others instead of setting it
+         -- master.
          -- awful.client.setslave(c)
 
-         -- Put windows in a smart way, only if they does not set an initial position.
+         -- Put windows in a smart way, only if they do not set an
+         -- initial position.
          if not c.size_hints.user_position and not c.size_hints.program_position then
             awful.placement.no_overlap(c)
             awful.placement.no_offscreen(c)
@@ -66,5 +67,5 @@ client.add_signal(
    function(c)
       c.border_color = beautiful.border_normal
       reset_title(c)
-      c.opacity = 0.4
+      c.opacity = 0.6
    end)

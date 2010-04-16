@@ -2,7 +2,9 @@
 
 require('naughty')
 
-local datebox = awful.widget.textclock({ align = "right" })
+local datebox = awful.widget.textclock(
+   {}, '%a %d %B <span color="' .. beautiful.fg_focus .. '">%H:%M</span>')
+
 local calendar = {}
 
 if conf == nil then

@@ -15,6 +15,7 @@ require('flaw')
 -- Load Debian menu entries
 require("debian.menu")
 
+os.setlocale(os.getenv('LC_ALL'))
 
 -- Variable definitions
 
@@ -134,20 +135,20 @@ for s = 1, screen.count() do
        {
           conf.widgets.launcher,
           conf.screens[s].widgets.taglist,
+          conf.screens[s].widgets.layout,
           conf.screens[s].widgets.wtitle,
           layout = awful.widget.layout.horizontal.leftright
        },
 
-       conf.screens[s].widgets.layout,
        conf.widgets.datebox,
        conf.gadgets.gmail.widget,
        conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
-       conf.gadgets.net_graph.widget,
-       conf.gadgets.net_icon.widget,
-       conf.gadgets.cpu_graph.widget,
-       conf.gadgets.cpu_icon.widget,
        s == 1 and conf.widgets.systray or nil,
+       s == 1 and conf.gadgets.net_graph.widget or nil,
+       s == 1 and conf.gadgets.net_icon.widget or nil,
+       s == 1 and conf.gadgets.cpu_graph.widget or nil,
+       s == 1 and conf.gadgets.cpu_icon.widget or nil,
        layout = awful.widget.layout.horizontal.rightleft
     }
 end
