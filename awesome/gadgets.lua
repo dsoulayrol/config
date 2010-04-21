@@ -18,6 +18,10 @@ conf.widgets.datebox = require('calendar')
 conf.widgets.systray = widget{ type = "systray" }
 conf.widgets.prompt = widget{ type = "textbox" }
 
+-- Client title
+conf.gadgets.title = flaw.gadget.TitleTextbox(
+   '', { pattern = ' <b><small>$title</small></b>' })
+
 -- GMail
 conf.gadgets.gmail = flaw.gadget.GMailTextbox(
    '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })

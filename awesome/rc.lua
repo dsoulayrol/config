@@ -40,7 +40,6 @@ os.setlocale(os.getenv('LC_ALL'))
 --           |_ wibox
 --           \_ widgets
 --                |_ layout
---                |_ window title
 --                \_ taglist
 
 conf = {}
@@ -108,11 +107,6 @@ for s = 1, screen.count() do
          awful.button({ }, 4, function () awful.layout.inc(conf.layouts, 1) end),
          awful.button({ }, 5, function () awful.layout.inc(conf.layouts, -1) end)))
 
-   -- Create a widget for the active window title.
-   conf.screens[s].widgets.wtitle = widget({ type = "textbox" })
-   conf.screens[s].widgets.wtitle.text =
-      "<b><small> " .. awesome.release .. " </small></b>"
-
    -- Create a taglist widget
    conf.screens[s].widgets.taglist =
       awful.widget.taglist(
@@ -136,14 +130,14 @@ for s = 1, screen.count() do
           conf.widgets.launcher,
           conf.screens[s].widgets.taglist,
           conf.screens[s].widgets.layout,
-          conf.screens[s].widgets.wtitle,
+          conf.gadgets.title.widget,
           layout = awful.widget.layout.horizontal.leftright
        },
 
        conf.widgets.datebox,
        conf.gadgets.gmail.widget,
-       conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
-       conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
+       -- conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
+       -- conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
        s == 1 and conf.widgets.systray or nil,
        s == 1 and conf.gadgets.net_graph.widget or nil,
        s == 1 and conf.gadgets.net_icon.widget or nil,
