@@ -135,6 +135,7 @@ for s = 1, screen.count() do
        },
 
        conf.widgets.datebox,
+       conf.gadgets.alsa.widget,
        conf.gadgets.gmail.widget,
        -- conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        -- conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,

@@ -27,6 +27,10 @@ conf.gadgets.gmail = flaw.gadget.GMailTextbox(
    '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })
 conf.gadgets.gmail:set_tooltip('Unread messages at $timestamp:\n$mails')
 
+-- ALSA
+conf.gadgets.alsa = flaw.gadget.AlsaTextbox(
+   '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span> | ' })
+
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.CPUIcon(
    'cpu', {}, { image = image(beautiful.icon_cpu) })
