@@ -1,3 +1,6 @@
+-- Set locale.
+os.setlocale(os.getenv('LANG'))
+
 -- Standard awesome library
 require('awful')
 require('awful.autofocus')
@@ -15,8 +18,6 @@ require('flaw')
 -- Load Debian menu entries
 require("debian.menu")
 
-os.setlocale(os.getenv('LC_ALL'))
-
 -- Variable definitions
 
 -- The whole configuration table.
@@ -31,7 +32,6 @@ os.setlocale(os.getenv('LC_ALL'))
 --     |_ gadgets
 --     |_ widgets
 --           |_ launcher
---           |_ datebox
 --           |_ systray
 --           |_ prompt
 --     |     \_ user defined widgets...
@@ -134,8 +134,9 @@ for s = 1, screen.count() do
           layout = awful.widget.layout.horizontal.leftright
        },
 
-       conf.widgets.datebox,
-       conf.gadgets.alsa.widget,
+       conf.gadgets.calendar.widget,
+       conf.gadgets.alsa_bar.widget,
+       conf.gadgets.alsa_lbl.widget,
        conf.gadgets.gmail.widget,
        -- conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        -- conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,

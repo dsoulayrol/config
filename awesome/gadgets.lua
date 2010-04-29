@@ -11,9 +11,6 @@ if conf == nil then
    -- perhaps should bind minimal default keys (restart).
 end
 
--- Load local modules
-conf.widgets.datebox = require('calendar')
-
 -- Create other common widgets
 conf.widgets.systray = widget{ type = "systray" }
 conf.widgets.prompt = widget{ type = "textbox" }
@@ -22,14 +19,29 @@ conf.widgets.prompt = widget{ type = "textbox" }
 conf.gadgets.title = flaw.gadget.TitleTextbox(
    '', { pattern = ' <b><small>$title</small></b>' })
 
+-- Calendar
+conf.gadgets.calendar = flaw.gadget.CalendarTextbox(
+   '', { clock_format = ' | %a %d %B - <span color="' ..
+         beautiful.fg_focus .. '">%H:%M</span>' })
+
 -- GMail
 conf.gadgets.gmail = flaw.gadget.GMailTextbox(
    '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })
 conf.gadgets.gmail:set_tooltip('Unread messages at $timestamp:\n$mails')
 
 -- ALSA
-conf.gadgets.alsa = flaw.gadget.AlsaTextbox(
-   '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span> | ' })
+conf.gadgets.alsa_lbl = flaw.gadget.AlsaTextbox(
+   '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span>% ' })
+
+conf.gadgets.alsa_bar = flaw.gadget.AlsaProgress('0')
+conf.gadgets.alsa_bar.hull:set_vertical(true)
+conf.gadgets.alsa_bar.hull:set_height(18)
+conf.gadgets.alsa_bar.hull:set_width(10)
+-- conf.gadgets.alsa_bar.hull:set_ticks(true)
+-- conf.gadgets.alsa_bar.hull:set_ticks_size(2)
+conf.gadgets.alsa_bar.hull:set_background_color(beautiful.bg_normal)
+conf.gadgets.alsa_bar.hull:set_gradient_colors(
+   { beautiful.bar_low, beautiful.bar_medium, beautiful.bar_high})
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.CPUIcon(

@@ -2,6 +2,7 @@ theme = {}
 
 theme.font          = "sans 8"
 
+-- Colors.
 theme.bg_normal     = "#222222"
 theme.bg_focus      = "#535d6c"
 theme.bg_urgent     = "#ff0000"
@@ -16,6 +17,10 @@ theme.border_width  = "2"
 theme.border_normal = "#000000"
 theme.border_focus  = "#ff2222"
 theme.border_marked = "#91231c"
+
+theme.bar_low = "#00ff00"
+theme.bar_medium = "#ffff00"
+theme.bar_high = "#ff0000"
 
 -- There are another variables sets
 -- overriding the default one when
