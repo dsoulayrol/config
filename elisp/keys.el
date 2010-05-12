@@ -9,7 +9,9 @@
         (t (self-insert-command (or arg 1)))))
 
 ;; GTags (M-. and M-* already defined in gtags.el)
-(global-set-key "\e," 'gtags-find-rtag)
+(add-hook 'gtags-mode-hook
+          (lambda()
+            (global-set-key "\e," 'gtags-find-rtag)))
 
 ;; Compilation
 (global-set-key "\C-xc" 'compile)

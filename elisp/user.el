@@ -1,3 +1,13 @@
+;; Unclutter the mode-line
+;;   (think C-h m to check loaded minor modes)
+(when (require 'diminish nil 'noerror)
+  (eval-after-load "global/gtags.el"
+    '(diminish 'gtags-mode "G"))
+  (eval-after-load "abbrev"
+    '(diminish 'abbrev-mode "Ab"))
+  (eval-after-load "yasnippet"
+    '(diminish 'yas/minor-mode " Y")))
+
 ;; Make fun of this damn mouse cursor
 (mouse-avoidance-mode (quote animate))
 
@@ -14,10 +24,18 @@
                    indicate-empty-lines t
                    default-indicate-buffer-boundaries 'left)))
 
-
+;; Kill Ring
+;; ---------
 ;; Typed text replaces the selection if the selection is active
 ;; Also allows to delete (not kill) the highlighted region by pressing <DEL>.
 (delete-selection-mode t)
+
+;; Use browse-kill-ring if available.
+;; (http://emacs-fu.blogspot.com/2010/04/navigating-kill-ring.html)
+(when (require 'browse-kill-ring nil 'noerror)
+  (browse-kill-ring-default-keybindings)
+  (global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu))))
+
 
 ;; Completion for mini-buffer.
 ;;(icomplete-mode t)
@@ -57,7 +75,7 @@
 
 ;; GNU Global
 ;;   (http://www.gnu.org/software/global/globaldoc.html)
-(when (require 'global "global/gtags.el" 'noerror)
+(when (require 'gtags "global/gtags.el" 'noerror)
   (add-hook 'java-mode-hook 'gtags-mode)
   (add-hook 'c++-mode-hook 'gtags-mode)
   (add-hook 'c-mode-hook 'gtags-mode))
