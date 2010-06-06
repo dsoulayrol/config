@@ -151,6 +151,7 @@ it)"
 ;; Programming Modes
 (load-user-elisp "local/elisp/user-lua.el")
 (load-user-elisp "local/elisp/user-python.el")
+(load-user-elisp "local/elisp/user-lisp.el")
 
 ;; Lastly, configuration local to the machine
 (load-user-elisp "local/elisp/user-local.el")
