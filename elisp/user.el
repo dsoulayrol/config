@@ -1,15 +1,6 @@
-;; Unclutter the mode-line
-;;   (think C-h m to check loaded minor modes)
-(when (require 'diminish nil 'noerror)
-  (eval-after-load "global/gtags.el"
-    '(diminish 'gtags-mode "G"))
-  (eval-after-load "abbrev"
-    '(diminish 'abbrev-mode "Ab"))
-  (eval-after-load "yasnippet"
-    '(diminish 'yas/minor-mode " Y")))
-
 ;; Make fun of this damn mouse cursor
-(mouse-avoidance-mode (quote animate))
+;; (no more necessary since 23.2 where the cursor is hidden when typing).
+; (mouse-avoidance-mode (quote animate))
 
 ;; Turn off the default backup behaviour
 (if (file-directory-p "~/.emacs.d/backup")
@@ -165,6 +156,14 @@ it)"
 
 (load-user-elisp "dist/elisp/sacha.el")
 (load-user-elisp "local/elisp/user-org.el")
+
+;; Unclutter the mode-line
+;;   (think C-h m to check loaded minor modes)
+(when (require 'diminish nil 'noerror)
+  (eval-after-load "abbrev"
+    '(diminish 'abbrev-mode "Ab"))
+  (eval-after-load "yasnippet"
+    '(diminish 'yas/minor-mode " Y")))
 
 ;; Programming Modes
 (load-user-elisp "local/elisp/user-lua.el")
