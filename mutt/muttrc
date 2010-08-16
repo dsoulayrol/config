@@ -43,7 +43,7 @@ set query_command="lbdbq '%s'"
 set edit_headers
 
 # Use a special instance of emacs to write mails.
-set editor = "emacsclient -t"
+set editor = "emacsclient -c"
 
 # Mailcap preferences
 set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
@@ -107,7 +107,7 @@ set net_inc = 5
 # ----------------------------------------------------------------------------
 
 my_hdr X-Operating-System: `uname -or`
-my_hdr X-URL: http://dsoulayrol.free.fr
+my_hdr X-URL: http://david.soulayrol.name
 my_hdr X-The-Answer: 42
 
 ignore          *
@@ -115,7 +115,6 @@ unignore        return-path from: to cc bcc subject resent-by date reply-to
 unignore        authenticated-sender apparently-from
 unignore        x-address x-organisation x-mailing-list
 unignore        mail-followup-to user-agent x-mailer x-newsreader
-unignore        x-spammer x-bogosity x-spam-status
 #unignore       message-id
 
 unhdr_order     *
@@ -154,6 +153,7 @@ source ~/.mutt/mls
 # The following line loads all the files present in the accounts subdirectory.
 # It is thus possible to create one file per account.
 source 'cat ~/.mutt/accounts/*|'
+source ~/.mutt/accounts/mailboxes
 
 # Aliases
 set alias_file = ~/.mutt/aliases
