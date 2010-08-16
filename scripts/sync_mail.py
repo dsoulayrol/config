@@ -24,8 +24,8 @@ mail. It is designed to fit well in my own configuration, which is:
     a full backup of my mail, which is also available while offline.
 - I have one POP account in my office.
 
-The script logically relies on isync to synchronise IMAP accounts, and
-procmail to distribute new mail. It reads its configuration from
+The script relies on isync to synchronise IMAP accounts, and procmail
+to distribute new mail. It reads most of its configuration from
 Mutt. POP fetching and glue is written using Python standard library.
 
 The script should be run with at least one --imap or --pop argument to
@@ -37,6 +37,12 @@ have the USER or LOGNAME variables set.
 Usage: sync_mail.py [--user login]
                     [--imap user:pass@server{[!]box, ...}]
                     [--pop user:pass@server]
+
+WARN: Note that using procmail is not a good idea there, because
+depending on the local configurations, mails could be moved even if
+not needed when they go through procmail. No mails will be lost, but
+from the user point of view this can mean no synchronisation of flags
+(read, seen, deleted) for some mails.
 """
 
 from __future__ import with_statement # This isn't required in Python 2.6
@@ -357,7 +363,7 @@ class Account(object):
                     self._folder, mb_name, mb_options, mb_stats))
             self._logger.debug('created %s %s %s' % (mb_name, mb_options, mb_stats))
         except mailbox.NoSuchMailboxError:
-            self._logger.error('non existent mailbox %s' % mb_name)
+            self._logger.warn('non existent mailbox %s' % mb_name)
 
     def _generate_mailbox(self, folder, name, options, stats):
         path = os.path.join(folder, name)
@@ -724,7 +730,7 @@ class MailHandler(object):
             obj = bus.get_object('org.freedesktop.Notifications',
                                  '/org/freedesktop/Notifications')
             itf = dbus.Interface(obj, 'org.freedesktop.Notifications')
-            itf.Notify('sync_mail.py', 0, '', 'New Mail!', message, [], {}, -1)
+            itf.Notify('sync_mail.py', 0, '', 'New Mail!', message, [], {}, 15000)
 
     def _count(self):
         """Count the sorted messages.
@@ -795,9 +801,10 @@ def start_sync():
             mail_handler = MailHandler(config)
             mail_handler.sort()
             mail_handler.notify()
-            #mail_handler.cleanup()
+            mail_handler.cleanup()
 
     except LockError:
+        print 'Another instance is already running'
         sys.exit(2)
 
 if __name__ == '__main__':
