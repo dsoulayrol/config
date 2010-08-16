@@ -19,3 +19,24 @@ git merge origin/master
 
 (See the very good tutorial on
  http://woss.name/2008/04/09/using-git-submodules-to-track-vendorrails/)
+
+2. Mail
+
+I synchronise my personal mail with distant IMAP servers so as to
+operate locally with mutt.
+
+I used to do this using isync (aka mbsync) and wrote the script
+sync_mail.py to generated the isync configuration on the fly, launch
+it and then call procmail with every new mail received. Since I also
+needed to fetch mail from a POP server at the office, the script also
+generates a configuration for fetchmail and calls it.
+
+This was not correct because some of my procmail's rules could move
+mail for no good reason and broke the synchronisation between my mails
+on different machines. Actually no mail was ever lost, but flags
+synchronisation was.
+
+So I now sort my mail on server side, and because my hosting does not
+provide intelligent filtering, I use imapfilter. I also switched from
+isync to offlineimap, because I think the latest is quicker, and its
+logs are clearer (YMMV of course).
