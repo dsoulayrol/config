@@ -16,7 +16,6 @@ set realname = "David Soulayrol"
 set charset = "utf-8"
 
 # Rely on sendmail (or any alternative)
-#set sendmail = "/usr/sbin/sendmail"
 set sendmail="/usr/sbin/sendmail -v -X /tmp/esmtp.log"
 
 # Reduce polling frequency to a sane level
@@ -29,8 +28,8 @@ set timeout = 10
 set imap_check_subscribed
 
 # Activate all caching capabilities
-set header_cache = "~/.mutt/cache"
-set message_cachedir = "~/.mutt/cache"
+set header_cache = "~/.cache/mutt"
+set message_cachedir = "~/.cache/mutt"
 
 # Always generate the From header - the false entries should be remove from here :)
 set use_from = yes
@@ -45,29 +44,38 @@ set edit_headers
 # Use a special instance of emacs to write mails.
 set editor = "emacsclient -c"
 
-# Mailcap preferences
+# Mutt's only Mailcap preferences
 set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
 
 # Calendar (uses wyrd)
-macro generic,pager <f2> "<shell-escape>wyrd<enter>" "Launch wyrd"
-macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.remind/from_mail store\n\<enter-command>set wait_key\n" "Enregistrer l'événement dans le calendrier"
-
-# Mail search (uses maidir-utils)
-macro index <F8> "<shell-escape>rm -rf ~/.mumatch; mu-find -o l -l ~/.mumatch " "mu-find"
-macro index <F9> "<change-folder-readonly>~/.mumatch" "display mu-find results"
+macro generic <f2> "<shell-escape>wyrd<enter>" "Launch wyrd"
+macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.remind/from_mail store\n\<enter-command>set wait_key\n" "Remind the event"
 
 # Forwarding attachments.
 set mime_forward = ask-no
 
 # Printing
-set print_command="muttprint"
+set print_command = muttprint
+set print_split = yes
+set print = yes
+
+# Simple search default pattern: From | To | Cc | Subject
+set simple_search="~f %s | ~C %s | ~s %s"
+
+set date_format="%Y.%m.%d %H:%M:%S %z"
 
 # ----------------------------------------------------------------------------
 #  display
 # ----------------------------------------------------------------------------
 
+# No first line display help
+unset help
+
 # Index format
-set index_format = "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
+set index_format = "%Z %{%b %d} %-20.20L (%4c) %s"
+
+# Folder format
+set folder_format="%t%N %F %-8.8u %-8.8g %8s %d %f"
 
 # Sorting
 # (date-received, date-sent, from, mailbox-order, size, subject, threads,
@@ -86,10 +94,21 @@ set strict_threads = no
 set sort_browser = alpha
 
 # Display of different MIME parts using mailcap entries.
-auto_view text/html text/enriched text/x-vcard
-auto_view image/*
+unauto_view *
+auto_view text/html text/enriched text/x-vcard \
+          application/x-diff-gzip application/x-gzip \
+          application/x-gunzip application/x-bzip2 \
+          application/x-cpio application/x-gtar \
+          application/x-tar application/x-tar-gz application/x-rar-compressed \
+          application/x-zip-compressed application/zip \
+          application/x-gunzip application/x-tar-gz application/x-debian-package \
+          application/x-tex application/x-dvi application/postscript  application/pdf \
+          application/x-script application/x-shellscript application/x-sh application/x-csh \
+          image/*
 
-alternative_order text/enriched text/plain text \
+# List of MIME-Types to give a priority when reading multipart/alternative
+unalternative_order *
+alternative_order text/enriched text/plain text text/html \
                   application/postscript application/pdf \
                   image/*
 
@@ -99,8 +118,32 @@ alternative_order text/enriched text/plain text \
 #
 set sort_alias=alias
 
-# Display download progress every 5K
+# Display progress
 set net_inc = 5
+set read_inc = 128
+set write_inc = 128
+
+# Interpret color codes in messages
+set allow_ansi = yes
+
+# Don't page menus
+set menu_scroll = yes
+
+# ----------------------------------------------------------------------------
+#  pager
+# ----------------------------------------------------------------------------
+
+# Don't auto-go to next msg
+set pager_stop
+
+# Wrap long lines without plus signs
+set markers = no
+
+# Number of lines kept on page to page
+set pager_context = 3
+
+# Mini-index at pager top
+set pager_index_lines = 6
 
 # ----------------------------------------------------------------------------
 #  headers insertion and weeding
@@ -115,13 +158,28 @@ unignore        return-path from: to cc bcc subject resent-by date reply-to
 unignore        authenticated-sender apparently-from
 unignore        x-address x-organisation x-mailing-list
 unignore        mail-followup-to user-agent x-mailer x-newsreader
-#unignore       message-id
 
 unhdr_order     *
-hdr_order       X-Mailing-List: Return-Path: \
-                From: Resent-By: Reply-To: \
-                X-Address: To: Cc: Bcc: \
-                Date: Subject: X-Bogosity:
+hdr_order       X-Mailing-List: From: To: Cc: Bcc: Date: Subject:
+
+# ----------------------------------------------------------------------------
+#  message composition
+# ----------------------------------------------------------------------------
+
+# Don't ask for using postponed message.
+set recall = no
+
+# Don't ask questions on replies
+set fast_reply
+
+# Always quote message when replying
+set include = yes
+
+# Traditional Fwd: subject
+set forward_format = "Fwd: %s"
+
+# Do not abort if not edited (ie. useful for reportbug)
+set abort_unmodified = no
 
 # ----------------------------------------------------------------------------
 #  color
@@ -130,10 +188,40 @@ hdr_order       X-Mailing-List: Return-Path: \
 source ~/.mutt/colors
 
 # ----------------------------------------------------------------------------
+#  hooks
+# ----------------------------------------------------------------------------
+
+# Only match "To" address for send-hooks
+set default_hook="~t %s"
+
+# Defaults for send-hooks
+send-hook . '\
+  set locale = "C" ;\
+  set attribution = "On %d, %n wrote:\n" ;\
+'
+
+# French messages
+send-hook .+@.+\.fr$ '\
+  set locale = "fr_FR" ;\
+  set attribution = "Le %{%A %d %B}, %n écrivit :\n" ;\
+'
+
+# Robots messages
+send-hook ^(majordomo|pgp|request) '\
+  set locale = "C" ;\
+  set attribution = "" ;\
+  set signature = "" ;\
+'
+
+# ----------------------------------------------------------------------------
 #  cryptography
 # ----------------------------------------------------------------------------
 
-source ~/.mutt/crypto
+# The number of seconds to keep in memory the passpharse used to encrypt/sign
+set pgp_timeout = 60
+
+# Sorting of PGP keys
+set pgp_sort_keys = trust
 
 # ----------------------------------------------------------------------------
 #  accounts
@@ -145,6 +233,7 @@ set spoolfile = +inbox
 set mbox = +inbox
 set record = +inbox
 set postponed = +drafts
+mailboxes "+mairix"
 
 # Known mailing lists
 source ~/.mutt/mls
@@ -159,9 +248,22 @@ source ~/.mutt/accounts/mailboxes
 set alias_file = ~/.mutt/aliases
 source ~/.mutt/aliases
 
-# Bogofilter integration
-macro index H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Apprendre comme ham"
-macro index S "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Ns\n\<enter-command>set wait_key\n\<save-message>=spam\n" "Apprendre comme spam et déplacer le message"
+# ----------------------------------------------------------------------------
+#  custom key bindings and macros
+# ----------------------------------------------------------------------------
 
-macro pager H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Apprendre comme ham"
-macro pager S "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Ns\n\<enter-command>set wait_key\n\<save-message>=spam\n" "Apprendre comme spam et déplacer le message"
+bind	index	<left>		previous-entry
+bind	index	<right>		next-entry
+
+
+# Dump all headers for printing
+macro index p <display-toggle-weed><print-message><display-toggle-weed><exit>
+macro pager p <display-toggle-weed><print-message><display-toggle-weed>
+
+# Mail search (uses mairix)
+macro generic \ef "<shell-escape>mairix -p && mairix " "Run a Mairix search"
+macro generic \em "<change-folder-readonly> =mairix\n" "Switch to Mairix search results"
+
+# Bogofilter integration
+macro index,pager H "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Sn\n\<enter-command>set wait_key\n" "Learn as ham"
+macro index,pager S "<enter-command>unset wait_key\n\<pipe-entry>bogofilter -Ns\n\<enter-command>set wait_key\n\<save-message>=spam\n" "Learn as spam and discard"

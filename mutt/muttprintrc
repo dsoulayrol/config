@@ -1,0 +1,50 @@
+PRINTER="TO_FILE:/home/dsoulayr/test.ps"
+
+#PRINT_COMMAND="lpr -P$PRINTER"
+PRINT_COMMAND="lpr"
+
+PAPER="A4"
+PENGUIN="/usr/share/ospics/Debian.eps"
+XFACE="on"
+
+DUPLEX="off"
+SPEED="30"
+
+#PAPERSAVE="optional"
+PAPERSAVE="no"
+
+FONT="Latex"
+FRONTSTYLE="Border"
+HEADRULE="on"
+FOOTRULE="on"
+
+REM_QUOTE="off"
+REM_SIG="off"
+SIG_REGEXP="^--( )?$"
+
+PRINTED_HEADERS="Date_To_From_CC_Newsgroups_*Subject*"
+
+DEBUG="0"
+
+FONTSIZE="10pt"
+WRAPMARGIN="80"
+TOPMARGIN="19"
+BOTTOMMARGIN="22"
+LEFTMARGIN="20"
+RIGHTMARGIN="20"
+
+ADDRESSFORMAT="%r <%a>,\n"
+DATE="local"
+DATE_FORMAT="%A %d %B %Y"
+
+# special options fancyvrvb environment
+VERBATIMNORMAL="numbers=left,stepnumber=5"
+VERBATIMSIG="fontshape=it,frame=topline"
+
+# own LaTeX code to be inserted
+LATEXCODE="\usepackage{color}"
+LATEXCODE1="\definecolor{grey}{rgb}{0.6, 0.6, 0.6}"
+LATEXCODE2="\renewcommand{\theFancyVerbLine}{\textcolor{grey}{\rmfamily\tiny\arabic{FancyVerbLine}}}"
+LATEXCODE3=""
+LATEXCODE4=""
+LATEXCODE5=""
