@@ -1,5 +1,10 @@
 My shared configuration. -- David Soulayrol <david.soulayrol@gmail.com>
 
+0. Local Configuration Handling
+
+The script scripts/manage_config.sh provides a way to store and share
+among one's own machines the files that are not stored in git.
+
 1. Awesome
 
 This Awesome configuration relies on flaw
