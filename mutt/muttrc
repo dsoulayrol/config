@@ -242,7 +242,6 @@ source ~/.mutt/mls
 # The following line loads all the files present in the accounts subdirectory.
 # It is thus possible to create one file per account.
 source 'cat ~/.mutt/accounts/*|'
-source ~/.mutt/accounts/mailboxes
 
 # Aliases
 set alias_file = ~/.mutt/aliases
