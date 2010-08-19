@@ -212,7 +212,7 @@ case "$1" in
     store)
         check_params $*
         check_server
-        $RSYNC $RSYNC_OPT --files-from $CONFIG_DIR/$FILES \
+        $RSYNC $RSYNC_OPT --delete --files-from $CONFIG_DIR/$FILES \
             $CONFIG_DIR $CONFIG_SERVER$REPOSITORY$NAME
         echo "stored $NAME on $CONFIG_SERVER"
         ;;
