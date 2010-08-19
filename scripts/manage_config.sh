@@ -163,6 +163,9 @@
 # 
 # EOD
 
+# TODO:
+# * Add a way to plug shell functions and variables in .bashrc
+#
 
 FILES=".local"
 LINKS=".links"
@@ -174,6 +177,7 @@ REPOSITORY="configs/"
 RSYNC="/usr/bin/rsync"
 RSYNC_OPT="-ctur"
 
+[ -e "$CONFIG_DIR" ] || exit 1
 [ -x "$RSYNC" ] || exit 1
 
 
@@ -201,32 +205,66 @@ check_server() {
     fi
 }
 
+build_local_files_list() {
+    LIST_FILE=`mktemp`
+    if [ -f "$CONFIG_DIR/$FILES" ]; then
+        cp $CONFIG_DIR/$FILES $LIST_FILE
+        echo $FILES >> $LIST_FILE
+    fi
+    if [ -f "$CONFIG_DIR/$LINKS" ]; then
+        echo $LINKS >> $LIST_FILE
+    fi
+    echo $LIST_FILE
+}
+
+hide_local_files() {
+    GIT_EXCLUDE_FILE="$CONFIG_DIR/.git/info/exclude"
+    if [ -f "$GIT_EXCLUDE_FILE" ]; then
+        TEMP_LIST=`build_local_files_list`
+        TEMP_FILE=`mktemp`
+        cp $GIT_EXCLUDE_FILE $TEMP_FILE
+        sed '/# BEGIN_LOCAL_CONFIG/,/# END_LOCAL_CONFIG/d' \
+            $TEMP_FILE > $GIT_EXCLUDE_FILE
+        echo "# BEGIN_LOCAL_CONFIG" >> $GIT_EXCLUDE_FILE
+        cat $TEMP_LIST >> "$GIT_EXCLUDE_FILE"
+        echo "# END_LOCAL_CONFIG" >> $GIT_EXCLUDE_FILE
+        rm $TEMP_LIST
+        rm $TEMP_FILE
+    fi
+}
+
 case "$1" in
     fetch)
         check_params $*
         check_server
-        $RSYNC $RSYNC_OPT -r \
+        $RSYNC $RSYNC_OPT \
             $CONFIG_SERVER$REPOSITORY$NAME/ $CONFIG_DIR
+        hide_local_files
         echo "fetched $NAME from $CONFIG_SERVER"
         ;;
     store)
         check_params $*
         check_server
-        $RSYNC $RSYNC_OPT --delete --files-from $CONFIG_DIR/$FILES \
+        TEMP_LIST=`build_local_files_list`
+        $RSYNC $RSYNC_OPT --delete --files-from $TEMP_LIST \
             $CONFIG_DIR $CONFIG_SERVER$REPOSITORY$NAME
+        rm $TEMP_LIST
+        hide_local_files
         echo "stored $NAME on $CONFIG_SERVER"
         ;;
     diff)
         check_params $*
         check_server
+        TEMP_LIST=`build_local_files_list`
         TEMP_DIR=`mktemp -d`
         $RSYNC $RSYNC_OPT -r \
             $CONFIG_SERVER$REPOSITORY$NAME/ $TEMP_DIR/other
         mkdir $TEMP_DIR/mine
         cd $CONFIG_DIR
-        cp -r --parents `cat $FILES` $TEMP_DIR/mine
+        cp -r --parents `cat $TEMP_LIST` $TEMP_DIR/mine
         cd $OLDPWD
         diff -urwN $TEMP_DIR/mine $TEMP_DIR/other
+        rm $TEMP_LIST
         rm -rf $TEMP_DIR
         ;;
     list)
@@ -236,31 +274,35 @@ case "$1" in
         ;;
     install)
         check_no_params $*
-        for line in `cat $CONFIG_DIR/$LINKS`; do
-            link=$HOME/`echo $line | sed 's/:.*$//'`
-            src=$CONFIG_DIR/`echo $line | sed 's/^.*://'`
-            if [ ! -e "$src" ]; then
-                echo "  skipping missing source: $src"
-            elif [ -e "$link" -a ! -L "$link" ]; then
-                echo "  skipping static target: $link"
-            else
-                echo "  linking $link to $src"
-                rm -f $link
-                ln -s $src $link
-            fi
-        done
+        if [ -f "$CONFIG_DIR/$LINKS" ]; then
+            for line in `cat $CONFIG_DIR/$LINKS`; do
+                link=$HOME/`echo $line | sed 's/:.*$//'`
+                src=$CONFIG_DIR/`echo $line | sed 's/^.*://'`
+                if [ ! -e "$src" ]; then
+                    echo "  skipping missing source: $src"
+                elif [ -e "$link" -a ! -L "$link" ]; then
+                    echo "  skipping static target: $link"
+                else
+                    echo "  linking $link to $src"
+                    rm -f $link
+                    ln -s $src $link
+                fi
+            done
+        fi
         ;;
     uninstall)
         check_no_params $*
-        for line in `cat $CONFIG_DIR/$LINKS`; do
-            link=$HOME/`echo $line | sed 's/:.*$//'`
-            if [ ! -L "$link" ]; then
-                echo "  skipping static target: $link"
-            else
-                echo "  removing $link"
-                rm -f $link
-            fi
-        done
+        if [ -f "$CONFIG_DIR/$LINKS" ]; then
+            for line in `cat $CONFIG_DIR/$LINKS`; do
+                link=$HOME/`echo $line | sed 's/:.*$//'`
+                if [ ! -L "$link" ]; then
+                    echo "  skipping static target: $link"
+                else
+                    echo "  removing $link"
+                    rm -f $link
+                fi
+            done
+        fi
         ;;
     help)
         cat $0 | sed '1,2d;/# EOD/Q;s/^# //g' | man -l -
