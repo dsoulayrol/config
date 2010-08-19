@@ -65,15 +65,15 @@
 # or
 # .I $HOME/.config
 # by default, hereafter named the user-specific configuration
-# directory. A setup is described by a list of files stored in
+# directory. A setup is described by a list of files and directories
+# stored in
 # .IR $XDG_CONFIG_HOME/.local .
 # Paths written in this file must be relative to the user-specific
 # configuration directory.
 # .PP
-# However, programs that do not obey to XDG Base Directory
-# Specification often read their configuration from the home
-# directory. The install command will install symbolic links for these
-# programs, using the
+# Programs that do not obey to XDG Base Directory Specification often
+# read their configuration from the home directory. The install
+# command will install symbolic links for these programs, using the
 # .IR $XDG_CONFIG_HOME/.links .
 # .PP
 # All the commands but install uninstall depend on
@@ -87,29 +87,30 @@
 # The server location. This value is used by
 # .B rsync
 # and MUST be defined. It is considered to be remote if it ends with a
-# colon.
+# colon, otherwise it normally should have a trailing slash.
+# .TP
+# .B HOME
+# The login directory MUST be defined. It is used to set the
+# user-specific configuration name, to locate the local configuration
+# directory if
+# .B XDG_CONFIG_HOME
+# is not defined, and to setup symbolic links.
 # .TP
 # .B XDG_CONFIG_HOME
 # The single base directory relative to which user-specific
 # configuration files should be written, as described in XDG Base
 # Directory Specification.
-# .TP
-# .B HOME
-# The login directory MUST be defined. It is used to set the default
-# local configuration name, to locate the local configuration
-# directory if
-# .B XDG_CONFIG_HOME
-# is not defined, and to setup symbolic links.
 # .SH FILES
 # .TP
-# .I $HOME/.config/.local
-# The list of files to handle. Paths must be relative to the
-# .I $HOME/.config
-# directory.
+# .I $XDG_CONFIG_HOME/.local
+# The list of files to handle. Each line must be a path to a file or a
+# directory. In the case of directories, its whole content will be
+# stored.  Paths must be relative to
+# .IR $XDG_CONFIG_HOME .
 # .TP
-# .I $HOME/.config/.links
-# The description of symbolic links needed be some programs. Each line
-# of this file is composed of the name of the link to be created in
+# .I $XDG_CONFIG_HOME/.links
+# The description of symbolic links needed by some programs. Each line
+# of this file must be composed of the name of the link to be created in
 # .I $HOME/
 # and the name of the target file or directory, separated by a colon.
 # .SH EXAMPLES
@@ -128,20 +129,20 @@
 # is the same on both machines.
 # .PP
 # Here is a
-# .I $HOME/.config/.local
+# .I $XDG_CONFIG_HOME/.local
 # example to take care of this.
 # .RS
 # \f(CWofflineimap/offlineimaprc\fP
 # .br
 # \f(CWimapfilter/config.lua\fP
 # .br
-# \f(CWmutt/local-accounts\fp
+# \f(CWmutt/accounts/\fP
 # .br
 # \f(CWmutt/local-aliases\fp
 # .RE
 # .PP
 # Here is a
-# .I $HOME/.config/.links
+# .I $XDG_CONFIG_HOME/.links
 # example to setup the symbolic links needed by those programs which
 # ignore XDG standard paths. Note how
 # .I muttprintrc
@@ -168,7 +169,6 @@ LINKS=".links"
 NAME=`hostname -s`_`basename $HOME`
 
 CONFIG_DIR=`[ -n "$XDG_CONFIG_HOME" ] && echo $XDG_CONFIG_HOME || echo $HOME/.config`
-TEMP_DIR="/tmp/tmp_config"
 REPOSITORY="configs/"
 
 RSYNC="/usr/bin/rsync"
@@ -185,11 +185,6 @@ check_params() {
     if [ $# -gt 1 ]; then
         NAME="$2"
     fi
-    if [ -z "$CONFIG_SERVER" ]; then
-        echo "manage_config.sh: error: no server"
-        exit 1
-    fi
-    echo "Using $NAME on $CONFIG_SERVER"
 }
 
 check_no_params() {
@@ -199,34 +194,44 @@ check_no_params() {
     fi
 }
 
+check_server() {
+    if [ -z "$CONFIG_SERVER" ]; then
+        echo "manage_config.sh: error: no server"
+        exit 1
+    fi
+}
+
 case "$1" in
     fetch)
         check_params $*
+        check_server
         $RSYNC $RSYNC_OPT -r \
             $CONFIG_SERVER$REPOSITORY$NAME/ $CONFIG_DIR
+        echo "fetched $NAME from $CONFIG_SERVER"
         ;;
     store)
         check_params $*
+        check_server
         $RSYNC $RSYNC_OPT --files-from $CONFIG_DIR/$FILES \
             $CONFIG_DIR $CONFIG_SERVER$REPOSITORY$NAME
+        echo "stored $NAME on $CONFIG_SERVER"
         ;;
     diff)
         check_params $*
+        check_server
+        TEMP_DIR=`mktemp -d`
         $RSYNC $RSYNC_OPT -r \
-            $CONFIG_SERVER$REPOSITORY$NAME/ $TEMP_DIR
-        for f in `cat $CONFIG_DIR/$FILES`; do
-            if [ ! -e $CONFIG_DIR/$f ]; then
-                echo "$f does not exist in current configuration"
-            elif [ ! -e $TEMP_DIR/$f ]; then
-                echo "$f does not exist in $NAME"
-            else
-                diff -u $CONFIG_DIR/$f $TEMP_DIR/$f
-            fi
-        done
+            $CONFIG_SERVER$REPOSITORY$NAME/ $TEMP_DIR/other
+        mkdir $TEMP_DIR/mine
+        cd $CONFIG_DIR
+        cp -r --parents `cat $FILES` $TEMP_DIR/mine
+        cd $OLDPWD
+        diff -urwN $TEMP_DIR/mine $TEMP_DIR/other
         rm -rf $TEMP_DIR
         ;;
     list)
         check_no_params $*
+        check_server
         $RSYNC $CONFIG_SERVER$REPOSITORY | sed '1d;s/^.* //g'
         ;;
     install)
