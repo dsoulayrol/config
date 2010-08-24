@@ -50,8 +50,10 @@ conf.screens = {}
 conf.gadgets = {}
 conf.widgets = {}
 
--- Default modkey.
+-- Default parameters
 conf.modkey = 'Mod4'
+conf.param.sweep_on_start = false
+conf.param.sweep_coords = { x = 0, y = 0 }
 
 -- Load local parameters
 dofile(awful.util.getdir('config') .. '/local.lua')
@@ -65,6 +67,7 @@ conf.apps = {}
 
 -- This is used later as the default terminal and editor to run.
 conf.apps.terminal = 'urxvt -ls'
+conf.apps.calendar = 'urxvt -rv -T agenda -e sh -c "remind ~/.config/remind/all.rem && read foo"'
 conf.apps.editor = os.getenv('EDITOR') or 'vim'
 conf.apps.editor_cmd = conf.apps.terminal .. ' -e ' .. conf.apps.editor
 
@@ -160,9 +163,11 @@ dofile(awful.util.getdir('config') .. '/bindings.lua')
 dofile(awful.util.getdir('config') .. '/hooks.lua')
 
 -- Load local modules
--- These modules can rely on the full configuration, so they must be
--- loaded late.
-require('sweep_mouse')
+-- ...
+
+if conf.param.sweep_on_start then
+   mouse.coords(conf.param.sweep_coords)
+end
 
 -- Now that everything is loaded, set bindings.
 root.keys(conf.bindings.global)

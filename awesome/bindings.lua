@@ -118,6 +118,10 @@ conf.bindings.global = awful.util.table.join(
                    client.focus:raise()
                 end
              end),
+   awful.key({ conf.modkey, }, "a",
+             function ()
+                awful.menu.clients({ width= 400 }, { keygrabber=true })
+             end),
 
    -- layout
    awful.key({ conf.modkey, }, "l", function () awful.tag.incmwfact( 0.05) end),
@@ -139,8 +143,14 @@ conf.bindings.global = awful.util.table.join(
    -- program shortcuts
    awful.key({ conf.modkey, }, "Return",
              function () awful.util.spawn(conf.apps.terminal) end),
+   awful.key({ conf.modkey, }, "c",
+             function () awful.util.spawn(conf.apps.calendar) end),
    awful.key({ conf.modkey, "Shift" }, "!",
              function () awful.util.spawn("xscreensaver-command --lock") end),
+
+   -- facilities
+   awful.key({ conf.modkey, "Shift" }, "s",
+             function () mouse.coords(conf.param.sweep_coords) end),
 
    -- awesome global control
    awful.key({ conf.modkey, "Shift" }, "r", awesome.restart),
