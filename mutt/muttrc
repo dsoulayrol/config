@@ -202,7 +202,7 @@ send-hook . '\
 
 # French messages
 send-hook .+@.+\.fr$ '\
-  set locale = "fr_FR" ;\
+  set locale = "fr_FR.UTF-8" ;\
   set attribution = "Le %{%A %d %B}, %n écrivit :\n" ;\
 '
 
