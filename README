@@ -45,3 +45,22 @@ So I now sort my mail on server side, and because my hosting does not
 provide intelligent filtering, I use imapfilter. I also switched from
 isync to offlineimap, because I think the latest is quicker, and its
 logs are clearer (YMMV of course).
+
+3. Calendar
+
+I use remind to store well known dates as well as meetings. Two
+configurations are provided:
+
+- all.rem displays complex and colorful information, thanks to
+  François Cerbelle's help. The scripts update_birthdays.sh and
+  update_feastdays.sh are helpers to feed the calendar with special
+  days for the contacts found in the abook base. It is dedicated to be
+  used in a console, or to generate a printed full calendar.
+
+- events.rem only relies on personal events, either stored with mutt
+  or manually. It is aimed at being loaded in daemon mode so as to
+  send on screen notifications.
+
+Both rely on the provided files and on batch_events and static_events
+which should be stored in ~/.remind. Birthdays and feast days for
+all.rem are stored in birthdays and feastdays in the same directory.

@@ -1,0 +1,65 @@
+set HOME getenv("HOME")
+
+# Fix "fuzzy" Home
+SET $LongDeg -3
+SET $LongMin 22
+SET $LongSec 00
+SET $LatDeg 48
+SET $LatMin 38
+SET $LatSec 00
+
+# Generic from remind distribution
+SET Quote CHAR(34)
+SET  Week_1      1
+SET  Week_2      8
+SET  Week_3     15
+SET  Week_4     22
+FSET _last(mo)      "1 " + MON((mo%12)+1) + " --7"
+FSET _trig()        TRIGGER(TRIGDATE())
+FSET _back(days)    TRIGGER(TODAY()-days)
+FSET _am_pm(tm) IIF(tm<01:00, tm+12*60+"am", \
+                    tm<12:00, tm+"am", \
+                    tm<13:00, tm+"pm", \
+                    tm-12*60+"pm")
+FSET _no_lz(s) IIF(SUBSTR(s, 1, 1)=="0", SUBSTR(s, 2), s)
+FSET _light_len(date) MAX(SUNSET(date)-SUNRISE(date), 0)
+FSET _dark_len(date) 1440-_light_len(date)
+FSET _yr_age(yr)        YEAR(TRIGDATE()) - yr
+FSET _mo_age(mo, yr)    12 * (YEAR(TRIGDATE()) - yr) + MONNUM(TRIGDATE()) - mo
+REM Sat Sun SPECIAL SHADE 220
+
+# Colors - use Nrm to reset to normal text.
+SET Esc   CHAR(27)
+
+SET Nrm   Esc + "[0m"
+SET Blk   Esc + "[0;30m"
+SET Red   Esc + "[0;31m"
+SET Grn   Esc + "[0;32m"
+SET Ylw   Esc + "[0;33m"
+SET Blu   Esc + "[0;34m"
+SET Mag   Esc + "[0;35m"
+SET Cyn   Esc + "[0;36m"
+SET Wht   Esc + "[0;37m"
+SET Gry   Esc + "[30;1m"
+SET BrRed Esc + "[31;1m"
+SET BrGrn Esc + "[32;1m"
+SET BrYlw Esc + "[33;1m"
+SET BrBlu Esc + "[34;1m"
+SET BrMag Esc + "[35;1m"
+SET BrCyn Esc + "[36;1m"
+SET BrWht Esc + "[37;1m"
+
+
+BANNER %
+INCLUDE [HOME]/.config/remind/_ephemeris
+
+MSG [BrCyn]Fêtes[Nrm]%"%"%
+INCLUDE [HOME]/.config/remind/_dates
+INCLUDE [HOME]/.remind/feastdays
+
+MSG [BrCyn]Anniversaires[Nrm]%"%"%
+INCLUDE [HOME]/.remind/birthdays
+
+MSG [BrCyn]Agenda[Nrm]%"%"%
+INCLUDE [HOME]/.remind/batch_events
+INCLUDE [HOME]/.remind/static_events

@@ -1,0 +1,4 @@
+set HOME getenv("HOME")
+
+INCLUDE [HOME]/.remind/batch_events
+INCLUDE [HOME]/.remind/static_events
