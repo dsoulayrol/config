@@ -1,0 +1,91 @@
+#
+# Christian holy days
+#
+
+# Fixed feasts
+REM      Jan  6     MSG %"Épiphanie%"%
+REM      Feb  2     MSG %"Chandeleur%"%
+REM      Mar  25    MSG %"Annonciation%"%
+REM      Jun  24    MSG %"St.Jean-Baptiste%"%
+REM      Aug  6     MSG %"Transfiguration%"%
+REM      Aug  15    MSG %"Assomption%" de Marie%
+REM      Nov  1     MSG %"Toussaint%"%
+REM      Dec  8     MSG %"Immaculée conception%"%
+REM      Dec  25    MSG %"Noël%"%
+
+# Moveable feasts based on christmas
+REM Sun  Dec  18    MSG %"Avent%" (4ème dimanche)%
+REM Sun  Dec  11    MSG %"Avent%" (3ème dimanche)%
+REM Sun  Dec  4     MSG %"Avent%" (2ème dimanche)%
+REM Sun  Nov  27    MSG %"Avent%" (1er dimanche)%
+REM Sun  Nov  20    MSG Fête du %"Christ Roi%"%
+
+# Moveable feasts based on easter
+SET easter EASTERDATE(YEAR(TODAY()))
+REM  [TRIGGER(easter-63)] MSG %"Septuagénisme%"%
+REM  [TRIGGER(easter-47)] MSG %"Mardi gras%"%
+REM  [TRIGGER(easter-46)] MSG Mercredi des %"Cendres%"%
+REM  [TRIGGER(easter-7)]  MSG Dimanche des %"Rameaux%"%
+REM  [TRIGGER(easter)] +8 MSG %"Semaine Sainte%"%
+REM  [TRIGGER(easter-3)]  MSG %"Jeudi saint%"%
+REM  [TRIGGER(easter-2)]  MSG %"Vendredi saint%"%
+REM  [TRIGGER(easter)]    MSG Dimanche de %"Paques%"%"%
+REM  [TRIGGER(easter+1)]  MSG %"Lundi de Paques%"%
+REM  [TRIGGER(easter+7)]  MSG %"Divine miséricorde%"%
+REM  [TRIGGER(easter+36)] MSG %"Rogations%"%
+REM  [TRIGGER(easter+37)] MSG %"Rogations%"%
+REM  [TRIGGER(easter+38)] MSG %"Rogations%"%
+REM  [TRIGGER(easter+39)] MSG Jeudi de l'%"Ascension%"%
+REM  [TRIGGER(easter+49)] MSG %"Pentecote%"%
+REM  [TRIGGER(easter+50)] MSG %"Lundi de Pentecote%"%
+REM  [TRIGGER(easter+56)] MSG %"Sainte trinité%"%
+REM  [TRIGGER(easter+60)] MSG %"Fête-Dieu%"%
+
+#
+# Other holy days
+#
+REM      Jan  7     MSG %"Noël orthodoxe%"%
+REM      Feb  14    MSG %"St.Valentin%"%
+REM      Mar  7     MSG %"Fête des grand-mères%"%
+REM      Mar  17    MSG %"St. Patrick%"%
+REM      Apr  1     MSG %"Poisson d'Avril%"%
+REM  Sun May [Week_2]   MSG %"Fete des meres%"%
+REM  Sun Jun [Week_3]   MSG %"Fete des peres%"%
+REM      Jun 24     MSG Feux de la %"St. Jean%"%
+REM      Oct 30     MSG %"Mischief Night%"%
+REM      Oct 31     MSG %"Halloween%"%
+REM  Thu Nov [Week_4]   SCANFROM [_back(7)] SATISFY 1
+           REM  [_trig()] MSG %"Thanksgiving%" Day%
+REM  Fri Nov [Week_4+1] SCANFROM [_back(7)] SATISFY 1
+           REM  [_trig()] MSG %"Thanksgiving%" (cont.)%
+REM      Dec 24     MSG %"Reveillon Noel%"%
+
+# Generic events
+REM 24 Mar +7 MSG %b is Ada Lovelace day!
+REM 25 May +7 MSG %b is Towel day!
+
+# Daylight saving time
+REM  Sun Mar 8 ++2 FROM 1 Jan 2007 MSG Passage à l'%"heure d'ete%" %b%
+REM Sun 1 Nov FROM 1 Jan 2007 MSG Passage à l'%"heure d'hiver%" %b%
+
+# Legal holydays
+SET SaveTrig $NumTrig
+OMIT     Jan  1     MSG %"Nouvel an%"%
+OMIT     May  1     MSG %"Fete du travail%"%
+OMIT     May  8     MSG %"Armistice 1945%"%
+OMIT     Jul  14    MSG %"Fete nationale%"%
+OMIT     Aug  15    MSG %"%" # Assomption
+OMIT     Nov  1     MSG %"%" # Toussaint
+OMIT     Nov  11    MSG %"Armistice 1918%"%
+OMIT     Dec  25    MSG %"%" # Noël
+OMIT [TRIGGER(easter+50)] MSG %"%" # Lundi de Pentecote
+
+if $NumTrig > SaveTrig
+   REM SPECIAL SHADE 220
+endif
+
+# 2001-2017 Seasons
+REM Mar [CHOOSE(YEAR(TODAY())-2000, 20,20,21,20,20,20,21,20,20,20,20,20,20,20,20,20,20)] MSG %"Printemps%"%
+REM Jun [CHOOSE(YEAR(TODAY())-2000, 21,21,21,21,21,21,21,20,21,21,21,20,21,21,21,20,21)] MSG %"Été%"%
+REM Sep [CHOOSE(YEAR(TODAY())-2000, 22,23,23,22,22,23,23,22,22,23,23,22,22,23,23,22,22)] MSG %"Automne%"%
+REM Dec [CHOOSE(YEAR(TODAY())-2000, 21,22,22,21,21,22,22,21,21,21,22,21,21,21,22,21,21)] MSG %"Hiver%"%

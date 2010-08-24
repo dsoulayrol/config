@@ -1,0 +1,14 @@
+[trigger(moondate(0))] SPECIAL MOON 0
+[trigger(moondate(1))] SPECIAL MOON 1
+[trigger(moondate(2))] SPECIAL MOON 2
+[trigger(moondate(3))] SPECIAL MOON 3
+
+REM PS Border Border BoxHeight add 10 sub moveto \
+    /SmallFont findfont 4 scalefont setfont \
+    (Soleil de [sunrise(trigdate())] à [sunset(trigdate())] ([(sunset(trigdate())-sunrise(trigdate()))-(sunset(trigdate()-1)-sunrise(trigdate()-1))] min.)) show
+
+MSG [BrYlw]Soleil de [sunrise(trigdate())] à [sunset(trigdate())] ([(sunset(trigdate())-sunrise(trigdate()))-(sunset(trigdate()-1)-sunrise(trigdate()-1))] min.)[Nrm], [BrWht]Prochaine pleine lune le [day(moondate(2))]/[monnum(moondate(2))][Nrm].%"%"%
+FSET _DayOfYear(x) x-(date(year(x),1,1) - 1)
+REM PS BoxWidth 3 mul 4 div Border BoxHeight add 10 sub moveto \
+    /SmallFont findfont 4 scalefont setfont \
+    ( [_DayOfYear(today())] ([365+isleap(today())-_DayOfYear(today())])) show

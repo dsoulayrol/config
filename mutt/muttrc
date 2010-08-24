@@ -49,7 +49,7 @@ set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
 
 # Calendar (uses wyrd)
 macro generic <f2> "<shell-escape>wyrd<enter>" "Launch wyrd"
-macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.remind/from_mail store\n\<enter-command>set wait_key\n" "Remind the event"
+macro attach \er "<enter-command>unset wait_key\n\<pipe-entry>ical2rem.py -o ~/.remind/batch_events store\n\<enter-command>set wait_key\n" "Remind the event"
 
 # Forwarding attachments.
 set mime_forward = ask-no
