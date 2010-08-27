@@ -16,7 +16,6 @@
  '(inhibit-startup-screen t)
  '(lazy-highlight-cleanup nil)
  '(lazy-highlight-max-at-a-time nil)
- '(org-agenda-files (quote ("~/doc/org/memo.org" "~/doc/org/tasks.org")))
  '(show-paren-mode t nil (paren))
  '(sml-modeline-borders nil)
  '(transient-mark-mode t)
