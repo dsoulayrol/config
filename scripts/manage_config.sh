@@ -112,7 +112,10 @@
 # The description of symbolic links needed by some programs. Each line
 # of this file must be composed of the name of the link to be created in
 # .I $HOME/
-# and the name of the target file or directory, separated by a colon.
+# and the name of the target file or directory, separated by a
+# colon. If the target name is absent, a directory is created with the
+# link name. If a file already exists in the link place and is not a
+# symbolic link, the line is ignored.
 # .SH EXAMPLES
 # Consider a mail setup using
 # .B offlineimap
@@ -157,7 +160,8 @@
 # .br
 # \f(CW.muttprintrc:mutt/muttprintrc\fp
 # .RE
-
+# .SH CAVEATS
+# Directories created with the install command are never destroyed.
 # .SH AUTHOR
 # This script was written by David Soulayrol <david.soulayrol@gmail.com>.
 # 
@@ -277,7 +281,19 @@ case "$1" in
         if [ -f "$CONFIG_DIR/$LINKS" ]; then
             for line in `cat $CONFIG_DIR/$LINKS`; do
                 link=$HOME/`echo $line | sed 's/:.*$//'`
-                src=$CONFIG_DIR/`echo $line | sed 's/^.*://'`
+                src=`echo $line | sed -e 's/^.*://'`
+
+                [ -z "$link" ] && continue
+                if [ -z "$src" ]; then
+                    if [ ! -e "$link" ]; then
+                        mkdir $link
+                    else
+                        echo "  skipping static target: $link"
+                    fi
+                    continue
+                fi
+
+                src=$CONFIG_DIR/$src
                 if [ ! -e "$src" ]; then
                     echo "  skipping missing source: $src"
                 elif [ -e "$link" -a ! -L "$link" ]; then
@@ -295,6 +311,7 @@ case "$1" in
         if [ -f "$CONFIG_DIR/$LINKS" ]; then
             for line in `cat $CONFIG_DIR/$LINKS`; do
                 link=$HOME/`echo $line | sed 's/:.*$//'`
+                [ -z "$link" -o ! -e "$link" ] && continue
                 if [ ! -L "$link" ]; then
                     echo "  skipping static target: $link"
                 else
