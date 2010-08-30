@@ -175,20 +175,20 @@ FILES=".local"
 LINKS=".links"
 NAME=`hostname -s`_`basename $HOME`
 
-CONFIG_DIR=`[ -n "$XDG_CONFIG_HOME" ] && echo $XDG_CONFIG_HOME || echo $HOME/.config`
+CONFIG_HOME=`[ -n "$XDG_CONFIG_HOME" ] && echo $XDG_CONFIG_HOME || echo $HOME/.config`
 REPOSITORY="configs/"
 
 RSYNC="/usr/bin/rsync"
 RSYNC_OPT="-ctur"
 
-[ -e "$CONFIG_DIR" ] || exit 1
-[ -x "$RSYNC" ] || exit 1
-
+trap_error() {
+    echo "manage_config.sh: error: $1"
+    exit 1
+}
 
 check_params() {
     if [ $# -gt 2 ]; then
-        echo "manage_config.sh: error: wrong arguments. try manage_config.sh help"
-        exit 1
+        trap_error "wrong arguments. try manage_config.sh help"
     fi
     if [ $# -gt 1 ]; then
         NAME="$2"
@@ -197,32 +197,30 @@ check_params() {
 
 check_no_params() {
     if [ $# -gt 1 ]; then
-        echo "manage_config.sh: error: wrong arguments. try manage_config.sh help"
-        exit 1
+        trap_error "wrong arguments. try manage_config.sh help"
     fi
 }
 
 check_server() {
     if [ -z "$CONFIG_SERVER" ]; then
-        echo "manage_config.sh: error: no server"
-        exit 1
+        trap_error "no server"
     fi
 }
 
 build_local_files_list() {
     LIST_FILE=`mktemp`
-    if [ -f "$CONFIG_DIR/$FILES" ]; then
-        cp $CONFIG_DIR/$FILES $LIST_FILE
+    if [ -f "$CONFIG_HOME/$FILES" ]; then
+        cp $CONFIG_HOME/$FILES $LIST_FILE
         echo $FILES >> $LIST_FILE
     fi
-    if [ -f "$CONFIG_DIR/$LINKS" ]; then
+    if [ -f "$CONFIG_HOME/$LINKS" ]; then
         echo $LINKS >> $LIST_FILE
     fi
     echo $LIST_FILE
 }
 
 hide_local_files() {
-    GIT_EXCLUDE_FILE="$CONFIG_DIR/.git/info/exclude"
+    GIT_EXCLUDE_FILE="$CONFIG_HOME/.git/info/exclude"
     if [ -f "$GIT_EXCLUDE_FILE" ]; then
         TEMP_LIST=`build_local_files_list`
         TEMP_FILE=`mktemp`
@@ -237,12 +235,15 @@ hide_local_files() {
     fi
 }
 
+[ -e "$CONFIG_HOME" ] || trap_error "configuration directory does not exist"
+[ -x "$RSYNC" ] || trap_error "rsync not in path"
+
 case "$1" in
     fetch)
         check_params $*
         check_server
         $RSYNC $RSYNC_OPT \
-            $CONFIG_SERVER$REPOSITORY$NAME/ $CONFIG_DIR
+            $CONFIG_SERVER$REPOSITORY$NAME/ $CONFIG_HOME
         hide_local_files
         echo "fetched $NAME from $CONFIG_SERVER"
         ;;
@@ -251,7 +252,7 @@ case "$1" in
         check_server
         TEMP_LIST=`build_local_files_list`
         $RSYNC $RSYNC_OPT --delete --files-from $TEMP_LIST \
-            $CONFIG_DIR $CONFIG_SERVER$REPOSITORY$NAME
+            $CONFIG_HOME $CONFIG_SERVER$REPOSITORY$NAME
         rm $TEMP_LIST
         hide_local_files
         echo "stored $NAME on $CONFIG_SERVER"
@@ -264,7 +265,7 @@ case "$1" in
         $RSYNC $RSYNC_OPT -r \
             $CONFIG_SERVER$REPOSITORY$NAME/ $TEMP_DIR/other
         mkdir $TEMP_DIR/mine
-        cd $CONFIG_DIR
+        cd $CONFIG_HOME
         cp -r --parents `cat $TEMP_LIST` $TEMP_DIR/mine
         cd $OLDPWD
         diff -urwN $TEMP_DIR/mine $TEMP_DIR/other
@@ -278,8 +279,8 @@ case "$1" in
         ;;
     install)
         check_no_params $*
-        if [ -f "$CONFIG_DIR/$LINKS" ]; then
-            for line in `cat $CONFIG_DIR/$LINKS`; do
+        if [ -f "$CONFIG_HOME/$LINKS" ]; then
+            for line in `cat $CONFIG_HOME/$LINKS`; do
                 link=$HOME/`echo $line | sed 's/:.*$//'`
                 src=`echo $line | sed -e 's/^.*://'`
 
@@ -293,7 +294,7 @@ case "$1" in
                     continue
                 fi
 
-                src=$CONFIG_DIR/$src
+                src=$CONFIG_HOME/$src
                 if [ ! -e "$src" ]; then
                     echo "  skipping missing source: $src"
                 elif [ -e "$link" -a ! -L "$link" ]; then
@@ -308,8 +309,8 @@ case "$1" in
         ;;
     uninstall)
         check_no_params $*
-        if [ -f "$CONFIG_DIR/$LINKS" ]; then
-            for line in `cat $CONFIG_DIR/$LINKS`; do
+        if [ -f "$CONFIG_HOME/$LINKS" ]; then
+            for line in `cat $CONFIG_HOME/$LINKS`; do
                 link=$HOME/`echo $line | sed 's/:.*$//'`
                 [ -z "$link" -o ! -e "$link" ] && continue
                 if [ ! -L "$link" ]; then
@@ -325,8 +326,7 @@ case "$1" in
         cat $0 | sed '1,2d;/# EOD/Q;s/^# //g' | man -l -
         ;;
     *)
-        echo "manage_config.sh: error: wrong arguments. try manage_config.sh help"
-        exit 1
+        trap_error "wrong arguments. try manage_config.sh help"
         ;;
 esac
 
