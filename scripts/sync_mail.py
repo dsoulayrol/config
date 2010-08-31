@@ -35,8 +35,8 @@ override the user name, which can be useful if the environment doesn't
 have the USER or LOGNAME variables set.
 
 Usage: sync_mail.py [--user login]
-                    [--imap user:pass@server{[!]box, ...}]
-                    [--pop user:pass@server]
+                    [--imap=user:pass@server{[!]box, ...}]
+                    [--pop=user:pass@server]
 
 WARN: Note that using procmail is not a good idea there, because
 depending on the local configurations, mails could be moved even if
@@ -292,7 +292,7 @@ class MaildirWrapper(mailbox.Maildir):
         return msg.get_flags().find('S') >= 0
 
     def is_message_sorted(self, msg, timestamp):
-        return msg.get_date() < timestamp
+        return msg.get_date() < (timestamp - 10)
 
 
 class MboxWrapper(mailbox.mbox):
@@ -654,7 +654,8 @@ class MailHandler(object):
                 box.lock()
                 self._logger.info('sorting %s ...' % box)
                 for key, msg in box.iteritems():
-                    if not box.is_message_sorted(msg, self._conf.timestamp):
+                    if not box.is_message_read(msg) and \
+                            not box.is_message_sorted(msg, self._conf.timestamp):
                         self._sort(box, key, msg)
                 box.unlock()
 
