@@ -50,6 +50,9 @@ shifty.config.apps = {
    { match = {"Iceweasel.*", "Firefox.*"       }, tag = "3:Net",              },
    { match = {"wireshark",                     }, tag = "wire"                },
 
+   -- gargoyle
+   { match = { "git" }, tag = "IF", fullscreen = true                         },
+
    -- gimp
    { match = { "Gimp" }, tag = "gimp",                                        },
    { match = { "gimp.toolbox", "gimp%-image%-window" },
