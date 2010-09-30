@@ -27,7 +27,7 @@ conf.gadgets.calendar = flaw.gadget.CalendarTextbox(
 -- GMail
 conf.gadgets.gmail = flaw.gadget.GMailTextbox(
    '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })
-conf.gadgets.gmail:set_tooltip('Unread messages at $timestamp:\n$mails')
+conf.gadgets.gmail:set_tooltip('Unread threads at $timestamp:\n$mails')
 
 -- ALSA
 conf.gadgets.alsa_lbl = flaw.gadget.AlsaTextbox(

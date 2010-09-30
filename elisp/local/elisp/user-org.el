@@ -15,16 +15,16 @@
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
 
-;; TODO: remove if OK.
-;; ;; Integrate Remember with Org
-;; (org-remember-insinuate)
+;; Julien Danjou's Google weather extension
+(require 'google-weather "google-weather-el/org-google-weather.el" 'noerror)
+
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 (define-key global-map "\C-cr" 'org-capture)
 
 ;; Captures
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline "tasks.org" "Tasks")
-         "* TODO %^{Brief Description} %^g\nADDED: %U\n%i%?\n")
+         "* TODO %^{Brief Description}%^g\nADDED: %U\n%i%?\n")
         ("j" "Journal" entry (file+datetree "journal.org")
          "* %?\nEntered on %U\n  %i\n  %a")))
 

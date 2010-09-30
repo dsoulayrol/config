@@ -2,7 +2,7 @@
 
 # .TH MANAGE_CONFIG 1 "August 18, 2010"
 # .SH NAME
-# manage_config.sh \- handling configuration files that cannot be spread.
+# manage_config.sh \- handling replication of config files that cannot be spread.
 # .SH SYNOPSIS
 # .B manage_config.sh
 # fetch
@@ -30,12 +30,12 @@
 # .B manage_config.sh
 # install
 # .SM
-#   install symbolic links (should follow a fetch)
+#   Install symbolic links (should follow a fetch)
 # .PP
 # .B manage_config.sh
 # uninstall
 # .SM
-#   remove symbolic links.
+#   Remove symbolic links.
 # .SH DESCRIPTION
 # Revision control systems are a nice way to keep configuration files
 # in a repository so as to share the same environment on more than one
