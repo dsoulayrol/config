@@ -24,78 +24,102 @@ To install:
   o For autoload on startup, copy this file to your xchat directory,
     probably ~/.xchat2.
 
-  o To load without restart, run: /py load xchat-away.py
+  o To load without restart, run: /py load xchat-xscreensaver.py
     (If you don't want to put it in your ~/.xchat2, then specify the full path.)
 
 If running the '/py' command above results in a message 'py :Unknown
  command', then you do not have the Python plugin installed.
 """
 
+import os
 import select
+import signal
 import subprocess
-import xchat
+import sys
+
+try:
+    import xchat
+except ImportError:
+    print "This module must be run inside XChat."
+    exit(1)
+
 
 __author__              = 'David Soulayrol <david.soulayrol at gmail.com>'
 __module_name__         = 'xchat-xscreensaver'
 __module_version__      = '0.1'
 __module_description__  = 'Updates presence on xscreensaver notifications'
 
+
 class Monitor(object):
+    """An object monitoring xscreensaver status for xchat."""
+
+    POLLING_PERIOD = 5000
+
     def __init__(self):
-        self.process = None
-        self.hook = None
+        self._process = None
+        self._hook = None
 
     def setup(self):
-        self.process = subprocess.Popen(['xscreensaver-command', '-watch'],
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self._process = self._create_pipe()
 
         # Register timed check of screensaver status.
-        self.register_hook()
+        self._hook = self._register_hook()
 
         xchat.hook_unload(self.unload_cb)
 
         # Register some commands.
-        xchat.hook_command("START_XS", self.on_start)
-        xchat.hook_command("STOP_XS", self.on_stop)
+        xchat.hook_command("xs_start_polling", self.on_start)
+        xchat.hook_command("xs_stop_polling", self.on_stop)
 
-    def register_hook(self):
-        self.hook = xchat.hook_timer(5000, self.check_xscreensaver_cb)
+        xchat.prnt('%s version %s by %s loaded' % (
+                __module_name__, __module_version__, __author__))
 
-    def check_xscreensaver_cb(self, userdata):
-        # TODO: check the pipe is not broken
-
-        rl, wl, xl = select.select([monitor.process.stdout], [], [], 0)
-        if len(rl):
-            event = self.process.stdout.readline()
-            if event.startswith('BLANK') or event.startswith('LOCK'):
-                xchat.command('away %s' % xchat.get_prefs('away_reason'))
-            elif event.startswith('UNBLANK'):
-                xchat.command('back')
+    def poll_status_cb(self, userdata):
+        self._process.poll()
+        if self._process.returncode is None:
+            rl, wl, xl = select.select([self._process.stdout], [], [], 0)
+            if len(rl):
+                event = self._process.stdout.readline()
+                if event.startswith('BLANK') or event.startswith('LOCK'):
+                    xchat.command('away %s' % xchat.get_prefs('away_reason'))
+                elif event.startswith('UNBLANK'):
+                    xchat.command('back')
+        else:
+            # pipe is broken.
+            self._process = self._create_pipe()
 
         # Keep the timeout going
         return 1
 
     def unload_cb(self, userdata):
-        self.process.terminate()
+        v = sys.version_info
+        if v[0] == 2 and v[1] < 6:
+            os.kill(self._process.pid, signal.SIGTERM)
+        else:
+            self._process.terminate()
+        self._process = None
+        xchat.prnt('%s unloaded' % __module_name__)
 
     def on_start(self, word, word_eol, userdata):
-        if self.hook is None:
-            self.register_hook()
+        if self._hook is None:
+            self._hook = self._register_hook()
             xchat.prnt('%s activated' % __module_name__)
         return xchat.EAT_ALL
 
-
     def on_stop(self, word, word_eol, userdate):
-        if self.hook is not None:
-            xchat.unhook(self.hook)
+        if self._hook is not None:
+            xchat.unhook(self._hook)
             xchat.prnt('%s deactivated' % __module_name__)
+            self._hook = None
         return xchat.EAT_ALL
+
+    def _register_hook(self):
+        return xchat.hook_timer(Monitor.POLLING_PERIOD, self.poll_status_cb)
+
+    def _create_pipe(self):
+        return subprocess.Popen(['xscreensaver-command', '-watch'],
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 if __name__ == '__main__':
-    monitor = Monitor()
-
-    monitor.setup()
-
-    xchat.prnt('%s version %s by %s loaded' % (
-            __module_name__, __module_version__, __author__))
+    Monitor().setup()
