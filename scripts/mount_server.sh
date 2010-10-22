@@ -2,33 +2,34 @@
 
 # A helper for manage_config.sh and manage_data.sh using sshfs.
 
-trap_usage() {
-    echo "usage: $0 mount_point remote"
-    exit 1
-}
-
-trap_error() {
-    echo "$0: error: $1"
-    exit 1
-}
-
 on_exit() {
+    popd > /dev/null
     fusermount -u $MOUNT_POINT
     rmdir $MOUNT_POINT
 }
 
-if [ $# -ne 2 ]; then
-    trap_usage
+set_mount_point() {
+    MOUNT_POINT=$1
+    if [ -e "$MOUNT_POINT" ]; then
+        trap_error "mount point ($MOUNT_POINT) is not free."
+    fi
+    mkdir $MOUNT_POINT
+}
+
+if [ $# -eq 0 ]; then
+    [ -n "$CONFIG_SERVER" ] || trap_error "set CONFIG_SERVER or specify locations"
+    REMOTE_PATH=$CONFIG_SERVER
+    MOUNT_POINT=`mktemp -d --suffix=_$CONFIG_SERVER`
+elif [ $# -eq 1 ]; then
+    [ -n "$CONFIG_SERVER" ] || trap_error "set CONFIG_SERVER or specify locations"
+    REMOTE_PATH=$CONFIG_SERVER
+    set_mount_point $1
+elif [ $# -eq 2 ]; then
+    REMOTE_PATH=$2
+    set_mount_point $1
+else
+    trap_usage "mount_point [server]"
 fi
-
-MOUNT_POINT=$1
-REMOTE_PATH=$2
-
-if [ -e "$MOUNT_POINT" ]; then
-    trap_error "mount point ($MOUNT_POINT) is not free."
-fi
-
-mkdir $MOUNT_POINT
 
 if [ ! -d "$MOUNT_POINT" ]; then
     trap_error "failed to create mount point ($MOUNT_POINT)."
@@ -44,5 +45,11 @@ fi
 trap on_exit EXIT
 
 export CONFIG_SERVER=$MOUNT_POINT/
-export DATA_SERVER=$MOUNT_POINT/
-PS1="[server:$MOUNT_POINT] $PS1" bash --norc
+pushd $MOUNT_POINT > /dev/null
+
+if [ -z "$CONFIG_ACTION" ]; then
+    PS1="[server:$MOUNT_POINT] $PS1" bash --norc
+else
+    $CONFIG_ACTION
+fi
+

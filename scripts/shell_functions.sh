@@ -12,6 +12,17 @@ export TERM=linux
 export EDITOR="emacsclient -c -a emacs"
 export VISUAL="emacsclient -c -a emacs"
 
+# generic way of reporting errors for configuration scripts
+trap_error() {
+    echo `basename $0`": error: $1"
+    exit 1
+}
+
+trap_usage() {
+    echo "usage: "`basename $0`" $1"
+    exit 1
+}
+
 # open mutt on a mairix search results
 search_mail() {
     mairix -t $*
@@ -32,3 +43,6 @@ cdp () {
         print _.dirname(_.realpath(${1}.__file__[:-1]))"
   )"
 }
+
+# Load all these macros when called non-interactively.
+export BASH_ENV="~/.config/scripts/shell_functions.sh"

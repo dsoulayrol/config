@@ -52,13 +52,13 @@
 # the files that had no previous version on the machine.
 # .PP
 # The sync command depends on
-# .B $DATA_SERVER
+# .B $CONFIG_SERVER
 # which is used by
 # .B unison
 # to locate the repository.
 # .SH ENVIRONMENT
 # .TP 18
-# .B DATA_SERVER
+# .B CONFIG_SERVER
 # The server location. This value is used by
 # .B unison
 # and MUST be defined for sync'ing. It is considered to be remote if it
@@ -123,11 +123,6 @@ backupsuffix = .\$VERSION\\
 merge = Name \* -> diff3 -m CURRENT1 CURRENTARCH CURRENT2 > NEW || echo ' \*\* Unresolved conflict' && exit 1\\
 "
 
-trap_error() {
-    echo "manage_data.sh: error: $1"
-    exit 1
-}
-
 check_params() {
     if [ $# -gt 2 ]; then
         trap_error "wrong arguments. try manage_config.sh help"
@@ -144,7 +139,7 @@ check_no_params() {
 }
 
 check_server() {
-    if [ -z "$DATA_SERVER" ]; then
+    if [ -z "$CONFIG_SERVER" ]; then
         trap_error "no server"
     fi
 }
@@ -205,7 +200,7 @@ case "$1" in
         check_no_params
         check_server
         check_profile
-        $UNISON $UNISON_OPT $UNISON_PRF $DATA_ROOT $DATA_SERVER$REPOSITORY
+        $UNISON $UNISON_OPT $UNISON_PRF $DATA_ROOT $CONFIG_SERVER$REPOSITORY
         ;;
     list)
         check_no_params $*

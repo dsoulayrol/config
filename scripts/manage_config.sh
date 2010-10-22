@@ -181,11 +181,6 @@ REPOSITORY="configs/"
 RSYNC="/usr/bin/rsync"
 RSYNC_OPT="-ctur"
 
-trap_error() {
-    echo "manage_config.sh: error: $1"
-    exit 1
-}
-
 check_params() {
     if [ $# -gt 2 ]; then
         trap_error "wrong arguments. try manage_config.sh help"
