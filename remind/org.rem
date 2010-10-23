@@ -1,0 +1,29 @@
+set HOME getenv("HOME")
+
+# Generic from remind distribution
+SET Quote CHAR(34)
+SET  Week_1      1
+SET  Week_2      8
+SET  Week_3     15
+SET  Week_4     22
+FSET _last(mo)      "1 " + MON((mo%12)+1) + " --7"
+FSET _trig()        TRIGGER(TRIGDATE())
+FSET _back(days)    TRIGGER(TODAY()-days)
+FSET _am_pm(tm) IIF(tm<01:00, tm+12*60+"am", \
+                    tm<12:00, tm+"am", \
+                    tm<13:00, tm+"pm", \
+                    tm-12*60+"pm")
+FSET _no_lz(s) IIF(SUBSTR(s, 1, 1)=="0", SUBSTR(s, 2), s)
+FSET _light_len(date) MAX(SUNSET(date)-SUNRISE(date), 0)
+FSET _dark_len(date) 1440-_light_len(date)
+FSET _yr_age(yr)        YEAR(TRIGDATE()) - yr
+FSET _mo_age(mo, yr)    12 * (YEAR(TRIGDATE()) - yr) + MONNUM(TRIGDATE()) - mo
+REM Sat Sun SPECIAL SHADE 220
+
+BANNER %
+
+INCLUDE [HOME]/.config/remind/_dates
+INCLUDE [HOME]/.remind/feastdays
+INCLUDE [HOME]/.remind/birthdays
+INCLUDE [HOME]/.remind/batch_events
+INCLUDE [HOME]/.remind/static_events
