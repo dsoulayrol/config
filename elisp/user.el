@@ -117,10 +117,6 @@
     (if (require 'flyspell nil 'noerror) (flyspell-mode t)))
 
 
-;; Address Book (http://savannah.nongnu.org/projects/addressbook/)
-;; ------------
-(require 'abook "addressbook/abook.el" 'noerror)
-
 ;; Yasnippet
 ;; ---------
 (when (require 'yasnippet nil 'noerror)
