@@ -154,13 +154,13 @@ my_hdr X-URL: http://david.soulayrol.name
 my_hdr X-The-Answer: 42
 
 ignore          *
-unignore        return-path from: to cc bcc subject resent-by date reply-to
+unignore        return-path from: to cc subject resent-by date reply-to
 unignore        authenticated-sender apparently-from
 unignore        x-address x-organisation x-mailing-list
 unignore        mail-followup-to user-agent x-mailer x-newsreader
 
 unhdr_order     *
-hdr_order       X-Mailing-List: From: To: Cc: Bcc: Date: Subject:
+hdr_order       X-Mailing-List: From: To: Cc: Date: Subject:
 
 # ----------------------------------------------------------------------------
 #  message composition
