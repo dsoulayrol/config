@@ -2,6 +2,7 @@
 
 -- Grab environment
 local awful = require('awful')
+local beautiful = require('beautiful')
 -- local revelation = require('revelation')
 
 if conf == nil then
@@ -176,7 +177,10 @@ conf.bindings.global = awful.util.table.join(
                         awful.util.getdir("cache") .. "/history")
              end),
    awful.key({ conf.modkey }, "F2",
-             function () awful.util.spawn( "dmenu_run -b" ) end),
+             function () awful.util.spawn( 'dmenu_run -b -nb "' .. beautiful.bg_normal ..
+                                           '" -nf "' .. beautiful.fg_normal ..
+                                           '" -sb "' .. beautiful.fg_focus ..
+                                           '" -sf "' .. beautiful.bg_focus .. '"') end),
    awful.key({ conf.modkey }, "F3",
              function ()
                 _prompt("Web search: ",
