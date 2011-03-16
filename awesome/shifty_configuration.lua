@@ -38,6 +38,7 @@ shifty.config.tags = {
    ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
    ["2:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
    ["3:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
+   ["4:Edit"] = { spawn = "emacsclient -c -a emacs", layout = "max",          },
    ["gimp"] = { spawn = "gimp", exclusive = true,
                 layout = "max", icon_only = true,
                 icon = "/usr/share/icons/hicolor/16x16/apps/gimp.png",        },
@@ -48,6 +49,8 @@ shifty.config.apps = {
    { match = { "htop", "Wicd", "jackctl"       }, tag = "1:Term",             },
    { match = {"xchat"                          }, tag = "2:IRC",              },
    { match = {"Iceweasel.*", "Firefox.*"       }, tag = "3:Net",              },
+   { match = {"Chromium.*", "chromium.*"       }, tag = "3:Net",              },
+   { match = {"Eclipse"                        }, tag = "4:Edit",             },
    { match = {"wireshark",                     }, tag = "wire"                },
 
    -- gargoyle
