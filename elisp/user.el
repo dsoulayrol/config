@@ -15,6 +15,13 @@
                    indicate-empty-lines t
                    default-indicate-buffer-boundaries 'left)))
 
+;; Frame title
+;;   (http://emacs-fu.blogspot.com/2011/01/setting-frame-title.html)
+(setq frame-title-format
+      '("" invocation-name ": "(:eval (if (buffer-file-name)
+                                          (abbreviate-file-name (buffer-file-name))
+                                        "%b"))))
+
 ;; Kill Ring
 ;; ---------
 ;; Typed text replaces the selection if the selection is active
@@ -83,8 +90,10 @@
               (or
                 (mode . c-mode)
                 (mode . c++-mode)
+                (mode . java-mode)
                 (mode . perl-mode)
                 (mode . python-mode)
+                (mode . ruby-mode)
                 (mode . emacs-lisp-mode)
                 ))
             ("Web"
