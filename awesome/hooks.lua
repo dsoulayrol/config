@@ -23,12 +23,17 @@ client.add_signal(
          end
       end)
 
-      if not startup then
-         -- Put windows in a smart way, only if they do not set an
-         -- initial position.
-         if not c.size_hints.user_position and not c.size_hints.program_position then
-            awful.placement.no_overlap(c)
-            awful.placement.no_offscreen(c)
+      -- Center the Agenda popup.
+      if c['name'] == 'agenda' then
+         awful.placement.centered(c)
+      else
+         if not startup then
+            -- Put windows in a smart way, only if they do not set an
+            -- initial position.
+            if not c.size_hints.user_position and not c.size_hints.program_position then
+               awful.placement.no_overlap(c)
+               awful.placement.no_offscreen(c)
+            end
          end
       end
    end)

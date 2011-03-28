@@ -67,7 +67,7 @@ conf.apps = {}
 
 -- This is used later as the default terminal and editor to run.
 conf.apps.terminal = 'urxvt -ls'
-conf.apps.calendar = 'urxvt -rv -T agenda -e sh -c "remind ~/.config/remind/all.rem && read foo"'
+conf.apps.calendar = 'urxvt -rv -T agenda -e bash --noprofile --norc -c "remind ~/.config/remind/all.rem && read -s -n1"'
 conf.apps.editor = os.getenv('EDITOR') or 'vim'
 conf.apps.editor_cmd = conf.apps.terminal .. ' -e ' .. conf.apps.editor
 

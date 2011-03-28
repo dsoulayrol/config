@@ -62,11 +62,11 @@ shifty.config.apps = {
      slave = true, float = true,                                              },
 
    -- floats
-   { match = { "MPlayer" }, float = true, ontop = true                        },
+   { match = { "MPlayer", "agenda" }, float = true, ontop = true              },
    { match = { "Wine" }, float = true                                         },
 
    -- intrusives
-   { match = { "urxvt", "urxvt-unicode" },
+   { match = { "urxvt", "urxvt-unicode", "agenda" },
      honorsizehints = true, intrusive = true,                                 },
 
    -- bindings
