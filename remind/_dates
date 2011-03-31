@@ -61,11 +61,12 @@ REM  Fri Nov [Week_4+1] SCANFROM [_back(7)] SATISFY 1
 REM      Dec 24     MSG %"Reveillon Noel%"%
 
 # Generic events
-REM 24 Mar +7 MSG %b is Ada Lovelace day!
-REM 25 May +7 MSG %b is Towel day!
+REM 14 March +7 AT 0:00  MSG %b %"Journée de Pi !%"%
+REM 24 March +7 AT 0:00  MSG %b %"Journée Ada Lovelace !%"%
+REM 25 May +7 AT 0:00  MSG %b %"Journée de la serviette !%"%
 
 # Daylight saving time
-REM  Sun Mar 8 ++2 FROM 1 Jan 2007 MSG Passage à l'%"heure d'ete%" %b%
+REM  Sun Mar 8 ++2 FROM 1 Jan 2007 MSG Passage à l'%"heure d'été%" %b%
 REM Sun 1 Nov FROM 1 Jan 2007 MSG Passage à l'%"heure d'hiver%" %b%
 
 # Legal holydays
