@@ -125,7 +125,7 @@ merge = Name \* -> diff3 -m CURRENT1 CURRENTARCH CURRENT2 > NEW || echo ' \*\* U
 
 check_params() {
     if [ $# -gt 2 ]; then
-        trap_error "wrong arguments. try manage_config.sh help"
+        trap_error "wrong arguments. try manage_data.sh help"
     fi
     if [ $# -gt 1 ]; then
         NAME="$2"
@@ -134,7 +134,7 @@ check_params() {
 
 check_no_params() {
     if [ $# -gt 1 ]; then
-        trap_error "wrong arguments. try manage_config.sh help"
+        trap_error "wrong arguments. try manage_date.sh help"
     fi
 }
 
