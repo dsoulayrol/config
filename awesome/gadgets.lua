@@ -1,10 +1,8 @@
 -- Gadgets population.
 
 -- Grab environment
-local awful = require('awful')
 local flaw = require('flaw')
 local beautiful = require('beautiful')
-local io = require('io')
 
 if conf == nil then
    -- should trace something here...
@@ -16,24 +14,24 @@ conf.widgets.systray = widget{ type = "systray" }
 conf.widgets.prompt = widget{ type = "textbox" }
 
 -- Client title
-conf.gadgets.title = flaw.gadget.TitleTextbox(
+conf.gadgets.title = flaw.gadget.text.title(
    '', { pattern = ' <b><small>$title</small></b>' })
 
 -- Calendar
-conf.gadgets.calendar = flaw.gadget.CalendarTextbox(
+conf.gadgets.calendar = flaw.gadget.text.calendar(
    '', { clock_format = ' | %a %d %B - <span color="' ..
          beautiful.fg_focus .. '">%H:%M</span>' })
 
 -- GMail
-conf.gadgets.gmail = flaw.gadget.GMailTextbox(
+conf.gadgets.gmail = flaw.gadget.text.gmail(
    '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })
-conf.gadgets.gmail:set_tooltip('Unread threads at $timestamp:\n$mails')
+conf.gadgets.gmail:set_tooltip('<u>Unread threads at $timestamp</u>\n$mails')
 
 -- ALSA
-conf.gadgets.alsa_lbl = flaw.gadget.AlsaTextbox(
+conf.gadgets.alsa_lbl = flaw.gadget.text.alsa(
    '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span>% ' })
 
-conf.gadgets.alsa_bar = flaw.gadget.AlsaProgress('0')
+conf.gadgets.alsa_bar = flaw.gadget.bar.alsa('0')
 conf.gadgets.alsa_bar.hull:set_vertical(true)
 conf.gadgets.alsa_bar.hull:set_height(18)
 conf.gadgets.alsa_bar.hull:set_width(10)
@@ -44,20 +42,20 @@ conf.gadgets.alsa_bar.hull:set_gradient_colors(
    { beautiful.bar_low, beautiful.bar_medium, beautiful.bar_high})
 
 -- Create CPU, CPUfreq monitor
-conf.gadgets.cpu_icon = flaw.gadget.CPUIcon(
+conf.gadgets.cpu_icon = flaw.gadget.icon.cpu(
    'cpu', {}, { image = image(beautiful.icon_cpu) })
 
-conf.gadgets.cpu_graph = flaw.gadget.CPUGraph(
+conf.gadgets.cpu_graph = flaw.gadget.graph.cpu(
    'cpu', {}, { width = 60, height = 18 })
 conf.gadgets.cpu_graph.hull:set_color(beautiful.fg_normal)
 conf.gadgets.cpu_graph.hull:set_border_color(beautiful.fg_normal)
 conf.gadgets.cpu_graph.hull:set_background_color(beautiful.bg_normal)
 
 -- Create network monitor
-conf.gadgets.net_icon = flaw.gadget.NetIcon(
+conf.gadgets.net_icon = flaw.gadget.icon.network(
    conf.param.net_device, {}, { image = image(beautiful.icon_net) })
 
-conf.gadgets.net_graph = flaw.gadget.NetGraph(
+conf.gadgets.net_graph = flaw.gadget.graph.network(
    conf.param.net_device, {}, { width = 60, height = 18 })
 conf.gadgets.net_graph.hull:set_color(beautiful.fg_normal)
 conf.gadgets.net_graph.hull:set_border_color(beautiful.fg_normal)
@@ -67,7 +65,7 @@ conf.gadgets.net_graph.hull:set_background_color(beautiful.bg_normal)
 
 -- Create battery monitor
 if flaw.battery ~= nil then
-   conf.gadgets.battery_icon = flaw.gadget.BatteryIcon(
+   conf.gadgets.battery_icon = flaw.gadget.icon.battery(
       conf.param.bat_device,
       {
          my_icons = {
@@ -112,9 +110,9 @@ if flaw.battery ~= nil then
             bg = beautiful.bg_focus} end
    )
 
-   conf.gadgets.battery_box = flaw.gadget.BatteryTextbox(
+   conf.gadgets.battery_box = flaw.gadget.text.battery(
       conf.param.bat_device,
-      { pattern = '<span color="#99aa99">$load</span>% $time' })
+      { pattern = '<span color="#99aa99">$load</span>% $st_symbol' })
    conf.gadgets.battery_box:add_event(
       flaw.event.LatchTrigger:new{condition = function(d) return d.load < 60 end },
       function(g) g.pattern = '<span color="#ffffff">$load</span>%' end
