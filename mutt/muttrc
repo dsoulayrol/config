@@ -42,7 +42,7 @@ set query_command="lbdbq '%s'"
 set edit_headers
 
 # Use a special instance of emacs to write mails.
-set editor = "emacsclient -c"
+set editor = $EDITOR
 
 # Mutt's only Mailcap preferences
 set mailcap_path=~/.mutt/mailcap:~/.mailcap:/etc/mailcap
