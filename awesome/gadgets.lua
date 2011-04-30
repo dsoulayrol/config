@@ -61,7 +61,12 @@ conf.gadgets.net_graph.hull:set_color(beautiful.fg_normal)
 conf.gadgets.net_graph.hull:set_border_color(beautiful.fg_normal)
 conf.gadgets.net_graph.hull:set_background_color(beautiful.bg_normal)
 
--- conf.widgets.memory_box = flaw.gadget.new('flaw.memory.textbox', '').widget
+-- Create wifi monitor
+if flaw.wifi ~= nil then
+   conf.gadgets.wifi_lbl = flaw.gadget.text.wifi(
+      conf.param.net_device, { delay = 10, pattern = '<span color="' .. beautiful.fg_focus .. '">$essid </span>'})
+   conf.gadgets.wifi_lbl:set_tooltip('<b>Access-Point:</b> $ap (<i>$mode</i>)\n<b>Link:</b> $rate Mbs ($quality)')
+end
 
 -- Create battery monitor
 if flaw.battery ~= nil then

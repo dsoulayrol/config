@@ -145,6 +145,7 @@ for s = 1, screen.count() do
        conf.gadgets.gmail.widget,
        s == 1 and conf.widgets.systray or nil,
        s == 1 and conf.gadgets.net_graph.widget or nil,
+       conf.gadgets.wifi_lbl and conf.gadgets.wifi_lbl.widget or nil,
        s == 1 and conf.gadgets.net_icon.widget or nil,
        s == 1 and conf.gadgets.cpu_graph.widget or nil,
        s == 1 and conf.gadgets.cpu_icon.widget or nil,
