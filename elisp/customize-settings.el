@@ -1,8 +1,8 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(c-basic-offset 4)
  '(c-default-style (quote ((c-mode . "linux") (c++-mode . "linux") (java-mode . "java") (other . "gnu"))))
  '(case-fold-search t)
@@ -16,15 +16,19 @@
  '(inhibit-startup-screen t)
  '(lazy-highlight-cleanup nil)
  '(lazy-highlight-max-at-a-time nil)
+ '(post-fixed-signature-source "~/.mutt/fixed_signature")
+ '(post-random-signature-command "fortune droit")
+ '(post-signature-directory "~/mutt/")
+ '(post-variable-signature-source "~/.mutt/signatures")
  '(show-paren-mode t nil (paren))
  '(sml-modeline-borders nil)
  '(transient-mark-mode t)
  '(truncate-lines 1))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(sml-modeline-end-face ((t (:inherit match))))
  '(sml-modeline-vis-face ((t (:background "grey30" :foreground "white")))))
