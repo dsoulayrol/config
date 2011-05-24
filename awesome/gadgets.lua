@@ -29,17 +29,7 @@ conf.gadgets.gmail:set_tooltip('<u>Unread threads at $timestamp</u>\n$mails')
 
 -- ALSA
 conf.gadgets.alsa_lbl = flaw.gadget.text.alsa(
-   '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span>% ' })
-
-conf.gadgets.alsa_bar = flaw.gadget.bar.alsa('0')
-conf.gadgets.alsa_bar.hull:set_vertical(true)
-conf.gadgets.alsa_bar.hull:set_height(18)
-conf.gadgets.alsa_bar.hull:set_width(10)
--- conf.gadgets.alsa_bar.hull:set_ticks(true)
--- conf.gadgets.alsa_bar.hull:set_ticks_size(2)
-conf.gadgets.alsa_bar.hull:set_background_color(beautiful.bg_normal)
-conf.gadgets.alsa_bar.hull:set_gradient_colors(
-   { beautiful.bar_low, beautiful.bar_medium, beautiful.bar_high})
+   '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span>%' })
 
 -- Create CPU, CPUfreq monitor
 conf.gadgets.cpu_icon = flaw.gadget.icon.cpu(
@@ -48,7 +38,6 @@ conf.gadgets.cpu_icon = flaw.gadget.icon.cpu(
 conf.gadgets.cpu_graph = flaw.gadget.graph.cpu(
    'cpu', {}, { width = 60, height = 18 })
 conf.gadgets.cpu_graph.hull:set_color(beautiful.fg_normal)
-conf.gadgets.cpu_graph.hull:set_border_color(beautiful.fg_normal)
 conf.gadgets.cpu_graph.hull:set_background_color(beautiful.bg_normal)
 
 -- Create network monitor
@@ -58,18 +47,17 @@ conf.gadgets.net_icon = flaw.gadget.icon.network(
 conf.gadgets.net_graph = flaw.gadget.graph.network(
    conf.param.net_device, {}, { width = 60, height = 18 })
 conf.gadgets.net_graph.hull:set_color(beautiful.fg_normal)
-conf.gadgets.net_graph.hull:set_border_color(beautiful.fg_normal)
 conf.gadgets.net_graph.hull:set_background_color(beautiful.bg_normal)
 
 -- Create wifi monitor
-if flaw.wifi ~= nil then
+if flaw.check_module('wifi') then
    conf.gadgets.wifi_lbl = flaw.gadget.text.wifi(
       conf.param.net_device, { delay = 10, pattern = '<span color="' .. beautiful.fg_focus .. '">$essid </span>'})
    conf.gadgets.wifi_lbl:set_tooltip('<b>Access-Point:</b> $ap (<i>$mode</i>)\n<b>Link:</b> $rate Mbs ($quality)')
 end
 
 -- Create battery monitor
-if flaw.battery ~= nil then
+if flaw.check_module('battery') then
    conf.gadgets.battery_icon = flaw.gadget.icon.battery(
       conf.param.bat_device,
       {
