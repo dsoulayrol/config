@@ -114,16 +114,17 @@
 
 ;; Mutt
 ;; ----
-(autoload 'post-mode "post" "mode for e-mail" t)
-(add-to-list 'auto-mode-alist
-             '("\\.*mutt-*\\|.article\\|\\.followup"
-               . post-mode))
-(add-hook 'post-mode-hook
-  (lambda()
-    (auto-fill-mode t)
-    (setq fill-column 72) ; rfc 1855 for usenet messages
-    (if (require 'footnote nil 'noerror) (footnote-mode t)))
-    (if (require 'flyspell nil 'noerror) (flyspell-mode t)))
+(when (require 'post nil 'noerror)
+  (autoload 'post-mode "post" "mode for e-mail" t)
+  (add-to-list 'auto-mode-alist
+               '("\\.*mutt-*\\|.article\\|\\.followup"
+                 . post-mode))
+  (add-hook 'post-mode-hook
+            (lambda()
+              (auto-fill-mode t)
+              (setq fill-column 72) ; rfc 1855 for usenet messages
+              (if (require 'footnote nil 'noerror) (footnote-mode t))
+              (if (require 'flyspell nil 'noerror) (flyspell-mode t)))))
 
 
 ;; Yasnippet

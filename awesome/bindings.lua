@@ -75,6 +75,40 @@ function _prompt(cue, exe_cb, completion_cb, cache)
    )
 end
 
+function tag_move(t, scr)
+   local ts = t or awful.tag.selected()
+   local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
+
+   shifty.set(ts, {screen = screen_target})
+end
+
+function tag_to_screen(t, scr)
+   local ts = t or awful.tag.selected()
+   local screen_origin = ts.screen
+   local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
+
+   awful.tag.history.restore(ts.screen,1)
+   tag_move(ts, screen_target)
+
+   -- never waste a screen
+   if #(screen[screen_origin]:tags()) == 0 then
+      for _, tag in pairs(screen[screen_target]:tags()) do
+         if not tag.selected then
+            tag_move(tag, screen_origin)
+            tag.selected = true
+            break
+         end
+      end
+   end
+
+   awful.tag.viewonly(ts)
+   mouse.screen = ts.screen
+   if #ts:clients() > 0 then
+      local c = ts:clients()[1]
+      client.focus = c
+   end
+end
+
 -- Mouse bindings
 root.buttons(
    awful.util.table.join(
@@ -108,9 +142,9 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ conf.modkey, "Shift" }, "k",
              function () awful.client.swap.byidx( -1) end),
    awful.key({ conf.modkey, "Control" }, "j",
-             function () awful.screen.focus( 1) end),
+             function () awful.screen.focus_relative( 1) end),
    awful.key({ conf.modkey, "Control" }, "k",
-             function () awful.screen.focus(-1) end),
+             function () awful.screen.focus_relative(-1) end),
    awful.key({ conf.modkey, }, "u", awful.client.urgent.jumpto),
    awful.key({ conf.modkey, }, "Tab",
              function ()
@@ -164,6 +198,7 @@ conf.bindings.global = awful.util.table.join(
              function()
                 shifty.add({ rel_index = 1, nopopup = true })
              end, nil, "new tag in bg"),
+   awful.key({ conf.modkey, "Control" }, "s", tag_to_screen, nil, "swap tag to next screen"),
    awful.key({ conf.modkey, }, "r", shifty.rename, nil, "tag rename"),
    awful.key({ conf.modkey, }, "w", shifty.del, nil, "tag delete"),
 

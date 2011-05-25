@@ -1,3 +1,7 @@
+# Extracting text in the pager, but invoking evince from attachments view.
+application/pdf; evince '%s'; test=test "$DISPLAY"
+application/pdf; pdftotext '%s' -; copiousoutput
+
 application/ms-word; antiword '%s' ; copiousoutput
 application/msword; antiword '%s' ; copiousoutput
 #application/vnd.ms-excel; xlhtml '%s' | w3m -dump -T text/html ; copiousoutput

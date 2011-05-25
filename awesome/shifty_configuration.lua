@@ -36,14 +36,18 @@ shifty.config.layouts = {
 
 shifty.config.tags = {
    ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
-   ["2:IRC"] = { spawn = "xchat", layout = "tilebottom",                      },
-   ["3:Net"] = { spawn = "iceweasel", layout = "tilebottom",                  },
+   ["2:IRC"]  = { spawn = "xchat", layout = "tiletop",                        },
+   ["3:Net"]  = { spawn = "iceweasel", layout = "tilebottom",                 },
    ["4:Edit"] = { spawn = "emacsclient -c -a emacs", layout = "max",          },
-   ["gimp"] = { spawn = "gimp", exclusive = true,
+   ["5:Gimp"] = { spawn = "gimp", exclusive = true,
                 layout = "max", icon_only = true,
                 icon = "/usr/share/icons/hicolor/16x16/apps/gimp.png",        },
-   ["wire"] = { layout = "tilebottom",                                        },
+   ["8:Wire"] = { layout = "tilebottom",                                      },
 }
+
+if screen.count() > 1 then
+   shifty.config.tags["9:Aux"] = { init = true, screen = 2, mwfact = 0.60, }
+end
 
 shifty.config.apps = {
    { match = { "htop", "Wicd", "jackctl"       }, tag = "1:Term",             },
@@ -51,7 +55,7 @@ shifty.config.apps = {
    { match = {"Iceweasel.*", "Firefox.*"       }, tag = "3:Net",              },
    { match = {"Chromium.*", "chromium.*"       }, tag = "3:Net",              },
    { match = {"Eclipse"                        }, tag = "4:Edit",             },
-   { match = {"wireshark",                     }, tag = "wire"                },
+   { match = {"wireshark",                     }, tag = "8:Wire"              },
 
    -- gargoyle
    { match = { "git" }, tag = "IF", fullscreen = true                         },
