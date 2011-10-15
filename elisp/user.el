@@ -35,12 +35,12 @@
   (global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu))))
 
 ;; Colorful parenthesis nesting around the point.
-(require 'highlight-parentheses nil 'noerror)
-(add-hook 'java-mode-hook 'highlight-parentheses-mode)
-(add-hook 'perl-mode-hook 'highlight-parentheses-mode)
-(add-hook 'c++-mode-hook 'highlight-parentheses-mode)
-(add-hook 'c-mode-hook 'highlight-parentheses-mode)
-(add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
+(when (require 'highlight-parentheses nil 'noerror)
+  (add-hook 'java-mode-hook 'highlight-parentheses-mode)
+  (add-hook 'perl-mode-hook 'highlight-parentheses-mode)
+  (add-hook 'c++-mode-hook 'highlight-parentheses-mode)
+  (add-hook 'c-mode-hook 'highlight-parentheses-mode)
+  (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode))
 
 ;; Completion for mini-buffer.
 ;;(icomplete-mode t)
