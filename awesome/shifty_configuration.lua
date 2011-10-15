@@ -36,8 +36,8 @@ shifty.config.layouts = {
 
 shifty.config.tags = {
    ["1:Term"] = { init = true, screen = 1, mwfact = 0.60,                     },
-   ["2:IRC"]  = { spawn = "xchat", layout = "tiletop",                        },
-   ["3:Net"]  = { spawn = "iceweasel", layout = "tilebottom",                 },
+   ["2:IRC"]  = { spawn = "xchat",                                            },
+   ["3:Net"]  = { spawn = "iceweasel",                                        },
    ["4:Edit"] = { spawn = "emacsclient -c -a emacs", layout = "max",          },
    ["5:Gimp"] = { spawn = "gimp", exclusive = true,
                 layout = "max", icon_only = true,

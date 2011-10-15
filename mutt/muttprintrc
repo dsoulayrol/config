@@ -1,4 +1,4 @@
-PRINTER="TO_FILE:/home/dsoulayr/test.ps"
+PRINTER="TO_FILE:/tmp/muttprint.ps"
 
 #PRINT_COMMAND="lpr -P$PRINTER"
 PRINT_COMMAND="lpr"

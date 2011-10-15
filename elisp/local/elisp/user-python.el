@@ -3,7 +3,9 @@
 ;;
 ;; The following handles pylint outputs with flymake
 ;;   (http://www.emacswiki.org/emacs/PythonMode).
-;; epylint.py must be in path and contain the following:
+;;
+;; epylint is now provided in the pylint package. If it is not
+;; available, the following script must replace it in the path:
 
 ;; #!/usr/bin/env python
 ;;
@@ -33,7 +35,7 @@
 ;;             line = re.sub("\\[([WE])?\\]", "%s:" % msg, line)
 ;;     print line,
 ;;
-;;     p.close()
+;; p.close()
 
 (when (load "flymake" t)
   (defun flymake-pylint-init ()
@@ -42,7 +44,7 @@
            (local-file (file-relative-name
                         temp-file
                         (file-name-directory buffer-file-name))))
-      (list "epylint.py" (list local-file))))
+      (list "epylint" (list local-file))))
 
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.py\\'" flymake-pylint-init)))
