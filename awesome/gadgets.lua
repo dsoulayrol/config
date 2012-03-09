@@ -22,11 +22,6 @@ conf.gadgets.calendar = flaw.gadget.text.calendar(
    '', { clock_format = ' | %a %d %B - <span color="' ..
          beautiful.fg_focus .. '">%H:%M</span>' })
 
--- GMail
-conf.gadgets.gmail = flaw.gadget.text.gmail(
-   '', { pattern = ' GMail: <span color="' .. beautiful.fg_focus .. '">$count</span> | ' })
-conf.gadgets.gmail:set_tooltip('<u>Unread threads at $timestamp</u>\n$mails')
-
 -- ALSA
 conf.gadgets.alsa_lbl = flaw.gadget.text.alsa(
    '0', { pattern = 'Vol.: <span color="' .. beautiful.fg_focus .. '">$volume</span>%' })

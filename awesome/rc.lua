@@ -141,7 +141,6 @@ for s = 1, screen.count() do
        conf.gadgets.battery_box and conf.gadgets.battery_box.widget or nil,
        conf.gadgets.battery_icon and conf.gadgets.battery_icon.widget or nil,
        conf.gadgets.alsa_lbl.widget,
-       conf.gadgets.gmail.widget,
        s == 1 and conf.widgets.systray or nil,
        s == 1 and conf.gadgets.net_graph.widget or nil,
        conf.gadgets.wifi_lbl and conf.gadgets.wifi_lbl.widget or nil,
