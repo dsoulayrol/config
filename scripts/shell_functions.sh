@@ -12,6 +12,11 @@ export TERM=linux
 export EDITOR="emacsclient -c -a emacs"
 export VISUAL="emacsclient -c -a emacs"
 
+if [ -d ~/.config/scripts ] ; then
+    PATH=~/.config/scripts:"${PATH}"
+fi
+export PATH
+
 # generic way of reporting errors for configuration scripts
 trap_error() {
     echo `basename $0`": error: $1"

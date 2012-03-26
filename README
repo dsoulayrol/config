@@ -11,7 +11,13 @@ scripts/manage_setup.sh and scripts/mount_server.sh are facilities to
 call in a raw the previous scripts when using a remote server with
 ssh.
 
-All these scripts rely on scripts/shell_functions.sh.
+All these scripts rely on scripts/shell_functions.sh. To make correct
+use of these tools, something like the following lines should be added
+to your preferred shell resources file (only tested for bash):
+
+export CONFIG_SERVER=your-server-path:
+source ~/.config/scripts/shell_functions.sh
+
 
 1. Awesome
 

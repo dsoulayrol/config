@@ -66,7 +66,7 @@ if flaw.check_module('battery') then
                         if self.provider.data.st_symbol == flaw.battery.STATUS_CHARGING then
                            self.widget.image = self.my_load_icon
                         else
-                           self.widget.image = self.my_icons[math.floor(self.provider.data.load / 30) + 1]
+                           self.widget.image = self.my_icons[math.ceil(self.provider.data.load / 30)]
                         end
                      end
       },
