@@ -2,6 +2,27 @@
 ;; (no more necessary since 23.2 where the cursor is hidden when typing).
 ; (mouse-avoidance-mode (quote animate))
 
+;; el-get
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+(unless (require 'el-get nil t)
+  (url-retrieve
+   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+   (lambda (s)
+     (end-of-buffer)
+     (eval-print-last-sexp))))
+
+(setq my:el-get-packages
+      '(browse-kill-ring
+        diminish
+        fixme-mode
+        google-weather
+        google-maps
+        highlight-parentheses
+        rainbow-mode
+        ))
+
+(el-get 'sync my:el-get-packages)
+
 ;; Turn off the default backup behaviour
 (if (file-directory-p "~/.emacs.d/backup")
     (setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
@@ -167,7 +188,6 @@ it)"
        (cons 'show-fly-err-at-point post-command-hook)))
 
 
-(load-user-elisp "dist/elisp/sacha.el")
 (load-user-elisp "local/elisp/user-org.el")
 
 ;; Unclutter the mode-line
@@ -178,10 +198,92 @@ it)"
   (eval-after-load "yasnippet"
     '(diminish 'yas/minor-mode " Y")))
 
+
 ;; Programming Modes
-(load-user-elisp "local/elisp/user-lua.el")
-(load-user-elisp "local/elisp/user-python.el")
-(load-user-elisp "local/elisp/user-lisp.el")
+;; =================
+
+;; Lua
+;; ---
+(when (load "flymake" t)
+  (defun flymake-lua-init ()
+    "Invoke luac with '-p' to get syntax checking"
+    (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-inplace))
+           (local-file  (file-relative-name
+                         temp-file
+                         (file-name-directory buffer-file-name))))
+      (list "luac" (list "-p" local-file))))
+
+  (push '("\\.lua\\'" flymake-lua-init) flymake-allowed-file-name-masks)
+  (push '("^.*luac[0-9.]*\\(.exe\\)?: *\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 2 3 nil 4)
+        flymake-err-line-patterns))
+
+(add-hook 'lua-mode-hook
+          '(lambda ()
+	     "Don't want flymake mode for lua regions in rhtml
+	      files and also on read only files"
+	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
+		 (flymake-mode))))
+
+
+;; Python
+;; ------
+;;
+;; The following handles pylint outputs with flymake
+;;   (http://www.emacswiki.org/emacs/PythonMode).
+;;
+;; epylint is now provided in the pylint package. If it is not
+;; available, the following script must replace it in the path:
+
+;; #!/usr/bin/env python
+;;
+;; import re
+;; import sys
+;;
+;; from subprocess import *
+;;
+;; p = Popen("pylint -f parseable -r n --disable-msg-cat=C,R %s" %
+;;           sys.argv[1], shell = True, stdout = PIPE).stdout
+;;
+;; for line in p.readlines():
+;;     match = re.search("\\[([WE])(, (.+?))?\\]", line)
+;;     if match:
+;;         kind = match.group(1)
+;;         func = match.group(3)
+;;
+;;         if kind == "W":
+;;             msg = "Warning"
+;;         else:
+;;             msg = "Error"
+;;
+;;         if func:
+;;             line = re.sub("\\[([WE])(, (.+?))?\\]",
+;;                           "%s (%s):" % (msg, func), line)
+;;         else:
+;;             line = re.sub("\\[([WE])?\\]", "%s:" % msg, line)
+;;     print line,
+;;
+;; p.close()
+
+(when (load "flymake" t)
+  (defun flymake-pylint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "epylint" (list local-file))))
+
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pylint-init)))
+
+(add-hook 'python-mode-hook
+          '(lambda ()
+	     "Don't want flymake mode for python regions in rhtml
+	      files and also on read only files"
+	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
+		 (flymake-mode))))
+
 
 ;; Lastly, configuration local to the machine
 (load-user-elisp "local/elisp/user-local.el")
