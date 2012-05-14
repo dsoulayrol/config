@@ -18,8 +18,10 @@
         google-weather
         google-maps
         highlight-parentheses
-        rainbow-mode
+        sml-modeline
         ))
+
+; rainbow-mode does not load correctly
 
 (el-get 'sync my:el-get-packages)
 
