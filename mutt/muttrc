@@ -14,6 +14,7 @@ set realname = "David Soulayrol"
 
 # Leave my bits alone :)
 set charset = "utf-8"
+set send_charset = "us-ascii:utf-8"
 
 # Rely on sendmail (or any alternative)
 set sendmail="/usr/sbin/sendmail -v -X /tmp/esmtp.log"
