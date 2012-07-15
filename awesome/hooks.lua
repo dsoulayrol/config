@@ -44,6 +44,11 @@ client.add_signal(
    function(c)
       c.border_color = beautiful.border_focus
       c.opacity = 1
+      if c.maximized_horizontal and c.maximized_vertical then
+         c.border_color = beautiful.border_max_focus
+      else
+         c.border_color = beautiful.border_focus
+      end
    end)
 
 client.add_signal(

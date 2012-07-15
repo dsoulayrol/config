@@ -239,7 +239,7 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ }, "XF86AudioLowerVolume",
              function () awful.util.spawn('amixer -c 0 set Master 5-db') end),
    awful.key({ }, "XF86AudioPlay",
-             function () awful.util.spawn('xmms2 toggle') end),
+             function () awful.util.spawn('xmms2 toggleplay') end),
    awful.key({ }, "XF86AudioNext",
              function () awful.util.spawn('xmms2 next') end),
    awful.key({ }, "XF86AudioStop",
@@ -255,7 +255,7 @@ conf.bindings.global = awful.util.table.join(
 
    -- For keyboard missing so-called multimedia keys
    awful.key({ conf.modkey }, "#127",
-             function () awful.util.spawn('xmms2 toggle') end)
+             function () awful.util.spawn('xmms2 toggleplay') end)
 )
 
 -- Client bindings
@@ -273,6 +273,11 @@ conf.bindings.client = awful.util.table.join(
              function (c)
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
+                if c.maximized_horizontal and c.maximized_vertical then
+                   c.border_color = beautiful.border_max_focus
+                else
+                   c.border_color = beautiful.border_focus
+                end
              end),
 
    -- opacity

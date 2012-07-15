@@ -16,6 +16,7 @@ theme.fg_minimize  = "#ffffff"
 theme.border_width  = "2"
 theme.border_normal = "#000000"
 theme.border_focus  = "#ff2222"
+theme.border_max_focus = "#ffff22"
 theme.border_marked = "#91231c"
 
 theme.bar_low = "#00ff00"
@@ -73,7 +74,7 @@ theme.titlebar_maximized_button_normal_active = "/usr/share/awesome/themes/defau
 theme.titlebar_maximized_button_focus_active = "/usr/share/awesome/themes/default/titlebar/maximized_focus_active.png"
 
 -- You can use your own command to set your wallpaper
-theme.wallpaper_cmd = { "hsetroot -solid black" }
+theme.wallpaper_cmd = { "hsetroot -solid '#000000'" }
 
 -- You can use your own layout icons like this:
 theme.layout_fairh = "/usr/share/awesome/themes/default/layouts/fairhw.png"
