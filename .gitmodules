@@ -1,3 +1,6 @@
 [submodule "awesome/flaw"]
 	path = awesome/flaw
 	url = git://github.com/dsoulayrol/flaw.git
+[submodule "emacs"]
+	path = emacs
+	url = git://github.com/dsoulayrol/emacs24-starter-kit.git

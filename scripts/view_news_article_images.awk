@@ -6,11 +6,11 @@ BEGIN {
     print dir;
 }
 
-/\[\w+\]:[[:blank:]]+.*\.(jpg|png)/ {
+/\[\w+\]:[[:blank:]]+.*\.(jpg|JPG|png|PNG)/ {
     system("curl " $2 " > " dir "/`echo " $2 " | tr '/' '!'`");
 }
 
 END {
-    system("cd " dir " && qiv *.jpg *.png");
+    system("cd " dir " && qiv *.jpg *.png *.JPG *.PNG");
     system("rm -rf " dir);
 }

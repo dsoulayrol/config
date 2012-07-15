@@ -239,7 +239,7 @@ conf.bindings.global = awful.util.table.join(
    awful.key({ }, "XF86AudioLowerVolume",
              function () awful.util.spawn('amixer -c 0 set Master 5-db') end),
    awful.key({ }, "XF86AudioPlay",
-             function () awful.util.spawn('xmms2 toggleplay') end),
+             function () awful.util.spawn('xmms2 toggle') end),
    awful.key({ }, "XF86AudioNext",
              function () awful.util.spawn('xmms2 next') end),
    awful.key({ }, "XF86AudioStop",
@@ -255,7 +255,7 @@ conf.bindings.global = awful.util.table.join(
 
    -- For keyboard missing so-called multimedia keys
    awful.key({ conf.modkey }, "#127",
-             function () awful.util.spawn('xmms2 toggleplay') end)
+             function () awful.util.spawn('xmms2 toggle') end)
 )
 
 -- Client bindings
