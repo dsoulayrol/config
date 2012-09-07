@@ -3,6 +3,7 @@
 -- Grab environment
 local awful = require('awful')
 local beautiful = require('beautiful')
+local flaw = require('flaw')
 -- local revelation = require('revelation')
 
 if conf == nil then
@@ -190,6 +191,10 @@ conf.bindings.global = awful.util.table.join(
    -- awesome global control
    awful.key({ conf.modkey, "Shift" }, "r", awesome.restart),
    awful.key({ conf.modkey, "Shift" }, "q", awesome.quit),
+
+   -- keyboard inputs
+   awful.key({ conf.modkey, 'Control' }, 'F11', flaw.keyboard.set_previous_layout),
+   awful.key({ conf.modkey, 'Control' }, 'F12', flaw.keyboard.set_next_layout),
 
    -- shifty dedicated bindings
    awful.key({ conf.modkey, }, "t",
