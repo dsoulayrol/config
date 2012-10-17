@@ -4,6 +4,7 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local keydoc = loadrc('keydoc', 'vbe/keydoc')
+local flaw = require('flaw')
 -- local revelation = require('revelation')
 
 if conf == nil then
@@ -204,6 +205,12 @@ conf.bindings.global = awful.util.table.join(
              'Restart Awesome'),
    awful.key({ conf.modkey, "Shift" }, "q", awesome.quit,
              'Quit Awesome'),
+
+   -- keyboard inputs
+   awful.key({ conf.modkey, 'Control' }, 'F11', flaw.keyboard.set_previous_layout,
+          'Previous keyboard map'),
+   awful.key({ conf.modkey, 'Control' }, 'F12', flaw.keyboard.set_next_layout,
+          'Next keyboard map'),
 
    -- shifty dedicated bindings
    keydoc.group('Shifty'),

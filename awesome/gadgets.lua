@@ -1,6 +1,7 @@
 -- Gadgets population.
 
 -- Grab environment
+local lfs = require('lfs')
 local flaw = require('flaw')
 local beautiful = require('beautiful')
 
@@ -17,9 +18,21 @@ conf.widgets.prompt = widget{ type = "textbox" }
 conf.gadgets.title = flaw.gadget.text.title(
    '', { pattern = ' <b><small>$title</small></b>' })
 
+-- Keyboard flag
+local kbd_icons_path = '/home/david/.config/awesome/icons/flags/'
+local flags = {}
+for file in lfs.dir(kbd_icons_path) do
+   lang = file:match('(%a%a)\.png')
+   if lang ~= nil then
+      flags[lang:lower()] = kbd_icons_path .. file
+   end
+end
+flaw.keyboard.set_flags_dict(flags)
+conf.gadgets.kbd = flaw.gadget.text.keyboard('')
+
 -- Calendar
 conf.gadgets.calendar = flaw.gadget.text.calendar(
-   '', { clock_format = ' | %a %d %B - <span color="' ..
+   '', { clock_format = ' %a %d %B - <span color="' ..
          beautiful.fg_focus .. '">%H:%M</span>' })
 
 -- ALSA
