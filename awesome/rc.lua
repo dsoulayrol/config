@@ -1,3 +1,34 @@
+function loadrc(name, mod)
+   local success
+   local result
+
+   local path = awful.util.getdir('config') .. '/' ..
+      (mod and 'lib/' or '') .. name .. '.lua'
+
+   -- If the module is already loaded, don't load it again
+   if mod and package.loaded[mod] then return package.loaded[mod] end
+
+   -- Execute the RC/module file
+   success, result = pcall(function() return dofile(path) end)
+   if not success then
+      naughty.notify({ title = 'Error while loading an RC file',
+                       text = 'When loading `' .. name ..
+                          '`, got the following error:\n' .. result,
+                       preset = naughty.config.presets.critical
+                    })
+      return print('E: error loading RC file `' .. name .. '`: ' .. result)
+   end
+
+   -- Is it a module?
+   if mod then
+      return package.loaded[mod]
+   end
+
+   return result
+end
+
+
+
 -- Set locale.
 os.setlocale(os.getenv('LANG'))
 
@@ -56,7 +87,7 @@ conf.param.sweep_on_start = false
 conf.param.sweep_coords = { x = 0, y = 0 }
 
 -- Load local parameters
-dofile(awful.util.getdir('config') .. '/local.lua')
+loadrc('local')
 
 -- Shifty configuration - Dynamic tagging library
 require("shifty_configuration")
@@ -92,7 +123,7 @@ conf.widgets.launcher =
    awful.widget.launcher{ image = image(beautiful.awesome_icon), menu = conf.menu }
 
 -- Common widgets
-dofile(awful.util.getdir('config') .. '/gadgets.lua')
+loadrc('gadgets')
 
 -- Populate screens
 for s = 1, screen.count() do
@@ -156,10 +187,10 @@ end
 shifty.taglist = { conf.screens[1].widgets.taglist }
 
 -- Keys and mouse bindings
-dofile(awful.util.getdir('config') .. '/bindings.lua')
+loadrc('bindings')
 
 -- Hooks
-dofile(awful.util.getdir('config') .. '/hooks.lua')
+loadrc('hooks')
 
 -- Load local modules
 -- ...

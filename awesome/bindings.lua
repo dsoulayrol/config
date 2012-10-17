@@ -3,6 +3,7 @@
 -- Grab environment
 local awful = require('awful')
 local beautiful = require('beautiful')
+local keydoc = loadrc('keydoc', 'vbe/keydoc')
 -- local revelation = require('revelation')
 
 if conf == nil then
@@ -121,6 +122,8 @@ root.buttons(
 conf.bindings.global = awful.util.table.join(
    conf.bindings.global,
 
+   keydoc.group('Focus'),
+
    -- tags
    awful.key({ conf.modkey, }, "Left", awful.tag.viewprev),
    awful.key({ conf.modkey, }, "Right", awful.tag.viewnext),
@@ -131,16 +134,20 @@ conf.bindings.global = awful.util.table.join(
              function ()
                 awful.client.focus.byidx( 1)
                 if client.focus then client.focus:raise() end
-             end),
+             end,
+             'Focus next window'),
    awful.key({ conf.modkey, }, "k",
              function ()
                 awful.client.focus.byidx(-1)
                 if client.focus then client.focus:raise() end
-             end),
+             end,
+             'Focus previous window'),
    awful.key({ conf.modkey, "Shift" }, "j",
-             function () awful.client.swap.byidx(  1) end),
+             function () awful.client.swap.byidx(  1) end,
+             'Swap with next window'),
    awful.key({ conf.modkey, "Shift" }, "k",
-             function () awful.client.swap.byidx( -1) end),
+             function () awful.client.swap.byidx( -1) end,
+             'Swap with previous window'),
    awful.key({ conf.modkey, "Control" }, "j",
              function () awful.screen.focus_relative( 1) end),
    awful.key({ conf.modkey, "Control" }, "k",
@@ -159,58 +166,69 @@ conf.bindings.global = awful.util.table.join(
              end),
 
    -- layout
-   awful.key({ conf.modkey, }, "l", function () awful.tag.incmwfact( 0.05) end),
-   awful.key({ conf.modkey, }, "h", function () awful.tag.incmwfact(-0.05) end),
-   awful.key({ conf.modkey, "Shift" }, "h",
-             function () awful.tag.incnmaster( 1) end),
-   awful.key({ conf.modkey, "Shift" }, "l",
-             function () awful.tag.incnmaster(-1) end),
-   awful.key({ conf.modkey, "Control" }, "h",
-             function () awful.tag.incncol( 1) end),
-   awful.key({ conf.modkey, "Control" }, "l",
-             function () awful.tag.incncol(-1) end),
-   awful.key({ conf.modkey, }, "space",
-             function () awful.layout.inc(layouts, 1) end),
-   awful.key({ conf.modkey, "Shift" }, "space",
-             function () awful.layout.inc(layouts, -1) end),
+   keydoc.group('Layout'),
+   awful.key({ conf.modkey, }, "l", function () awful.tag.incmwfact( 0.05) end,
+             'Increase master width factor'),
+   awful.key({ conf.modkey, }, "h", function () awful.tag.incmwfact(-0.05) end,
+             'Decrease master width factor'),
+   awful.key({ conf.modkey, "Shift" }, "h", function () awful.tag.incnmaster( 1) end,
+             'Increase number of masters'),
+   awful.key({ conf.modkey, "Shift" }, "l", function () awful.tag.incnmaster(-1) end,
+             'Decrease number of masters'),
+   awful.key({ conf.modkey, "Control" }, "h", function () awful.tag.incncol( 1) end,
+             'Increase number of columns'),
+   awful.key({ conf.modkey, "Control" }, "l", function () awful.tag.incncol(-1) end,
+             'Decrease number of columns'),
+   awful.key({ conf.modkey, }, "space", function () awful.layout.inc(layouts, 1) end,
+             'Next layout'),
+   awful.key({ conf.modkey, "Shift" }, "space", function () awful.layout.inc(layouts, -1) end,
+             'Previous layout'),
+
 -- awful.key({ conf.modkey }, "F2", revelation.revelation)
 
    -- program shortcuts
-   awful.key({ conf.modkey, }, "Return",
-             function () awful.util.spawn(conf.apps.terminal) end),
-   awful.key({ conf.modkey, }, "c",
-             function () awful.util.spawn(conf.apps.calendar) end),
-   awful.key({ conf.modkey, "Shift" }, "!",
-             function () awful.util.spawn("xscreensaver-command --lock") end),
+   keydoc.group('Misc'),
+   awful.key({ conf.modkey, }, "Return", function () awful.util.spawn(conf.apps.terminal) end,
+             'Spawn a terminal'),
+   awful.key({ conf.modkey, }, "c", function () awful.util.spawn(conf.apps.calendar) end,
+             'Open the calendar'),
+   awful.key({ conf.modkey, "Shift" }, "!", function () awful.util.spawn("xscreensaver-command --lock") end,
+             'Lock the session'),
 
    -- facilities
-   awful.key({ conf.modkey, "Shift" }, "s",
-             function () mouse.coords(conf.param.sweep_coords) end),
+   awful.key({ conf.modkey, "Shift" }, "s", function () mouse.coords(conf.param.sweep_coords) end,
+             'Move the mouse out of the way'),
 
    -- awesome global control
-   awful.key({ conf.modkey, "Shift" }, "r", awesome.restart),
-   awful.key({ conf.modkey, "Shift" }, "q", awesome.quit),
+   awful.key({ conf.modkey, "Shift" }, "r", awesome.restart,
+             'Restart Awesome'),
+   awful.key({ conf.modkey, "Shift" }, "q", awesome.quit,
+             'Quit Awesome'),
 
    -- shifty dedicated bindings
-   awful.key({ conf.modkey, }, "t",
-             function() shifty.add({ rel_index = 1 }) end, nil, "new tag"),
-   awful.key({ conf.modkey, "Control" }, "t",
-             function()
-                shifty.add({ rel_index = 1, nopopup = true })
-             end, nil, "new tag in bg"),
-   awful.key({ conf.modkey, "Control" }, "s", tag_to_screen, nil, "swap tag to next screen"),
-   awful.key({ conf.modkey, }, "r", shifty.rename, nil, "tag rename"),
-   awful.key({ conf.modkey, }, "w", shifty.del, nil, "tag delete"),
+   keydoc.group('Shifty'),
+   awful.key({ conf.modkey, }, "t", function() shifty.add({ rel_index = 1 }) end, nil,
+             "New tag"),
+   awful.key({ conf.modkey, "Control" }, "t", function() shifty.add({ rel_index = 1, nopopup = true }) end, nil,
+             "New tag in background"),
+   awful.key({ conf.modkey, "Control" }, "s", tag_to_screen, nil,
+             "Send tag to next screen"),
+   awful.key({ conf.modkey, }, "r", shifty.rename, nil,
+             "Rename tag"),
+   awful.key({ conf.modkey, }, "w", shifty.del, nil,
+             "Delete tag"),
 
    -- diagnostic
-   awful.key({ conf.modkey, }, 'i', _get_tag_info, nil, "tag info"),
+   awful.key({ conf.modkey, }, 'i', _get_tag_info, nil, "Display tag info"),
 
    -- Prompt
    awful.key({ conf.modkey }, "F1",
              function ()
                 _prompt("Run: ", awful.util.spawn, awful.completion.bash,
                         awful.util.getdir("cache") .. "/history")
-             end),
+             end,
+             'Prompt'),
+
    awful.key({ conf.modkey }, "F2",
              function () awful.util.spawn( 'dmenu_run -b -nb "' .. beautiful.bg_normal ..
                                            '" -nf "' .. beautiful.fg_normal ..
@@ -222,53 +240,54 @@ conf.bindings.global = awful.util.table.join(
                         function (command)
                            awful.util.spawn("uzbl 'http://yubnub.org/parser/parse?command=" .. command .. "'", false) end, nil,
                         awful.util.getdir("cache") .. "/history_web")
-             end),
+             end,
+             'Web search'),
+
    awful.key({ conf.modkey }, "F4",
              -- TODO: the wibox doesn't get closed if the Lua expression has an error.
              function ()
                 _prompt("Run Lua code: ",
                         awful.util.eval, nil,
                         awful.util.getdir("cache") .. "/history_eval")
-             end),
+             end,
+             'Lua prompt'),
 
    -- Special keys
-   awful.key({ }, "XF86AudioMute",
-             function () awful.util.spawn('amixer -c 0 set Master toggle') end),
-   awful.key({ }, "XF86AudioRaiseVolume",
-             function () awful.util.spawn('amixer -c 0 set Master 5+db') end),
-   awful.key({ }, "XF86AudioLowerVolume",
-             function () awful.util.spawn('amixer -c 0 set Master 5-db') end),
-   awful.key({ }, "XF86AudioPlay",
-             function () awful.util.spawn('xmms2 toggleplay') end),
-   awful.key({ }, "XF86AudioNext",
-             function () awful.util.spawn('xmms2 next') end),
-   awful.key({ }, "XF86AudioStop",
-             function () awful.util.spawn('xmms2 stop ') end),
-   awful.key({ }, "XF86AudioPrev",
-             function () awful.util.spawn('xmms2 prev ') end),
-   -- awful.key({ }, "XF86Sleep", function () awful.util.spawn('sudo pm-suspend --quirk-dpms-on --quirk-vbestate-restore --quirk-vbemode-restore') end),
-   -- awful.key({ }, "XF86HomePage", function () awful.util.spawn('sudo cpufreq-set -g ondemand') end),
-   -- awful.key({ }, "XF86Start", function () awful.util.spawn('sudo cpufreq-set -g powersave') end),
+   awful.key({ }, "XF86AudioMute", function () awful.util.spawn('amixer -c 0 set Master toggle') end),
+   awful.key({ }, "XF86AudioRaiseVolume", function () awful.util.spawn('amixer -c 0 set Master 5+db') end),
+   awful.key({ }, "XF86AudioLowerVolume", function () awful.util.spawn('amixer -c 0 set Master 5-db') end),
+   awful.key({ }, "XF86AudioPlay", function () awful.util.spawn('xmms2 toggleplay') end),
+   awful.key({ }, "XF86AudioNext", function () awful.util.spawn('xmms2 next') end),
+   awful.key({ }, "XF86AudioStop", function () awful.util.spawn('xmms2 stop ') end),
+   awful.key({ }, "XF86AudioPrev", function () awful.util.spawn('xmms2 prev ') end),
    awful.key({ }, "XF86WWW", function () awful.util.spawn('iceweasel') end),
    awful.key({ }, "XF86Mail", function () awful.util.spawn('urxvt -e mutt') end),
    awful.key({ }, "XF86Messenger", function () awful.util.spawn('xchat') end),
 
    -- For keyboard missing so-called multimedia keys
-   awful.key({ conf.modkey }, "#127",
-             function () awful.util.spawn('xmms2 toggleplay') end)
+   awful.key({ conf.modkey }, "#127", function () awful.util.spawn('xmms2 toggleplay') end),
+
+   -- Help
+   awful.key({ conf.modkey }, "*", keydoc.display)
 )
 
 -- Client bindings
 conf.bindings.client = awful.util.table.join(
-   awful.key({ conf.modkey, "Control" }, "f",
-             function (c) c.fullscreen = not c.fullscreen end),
-   awful.key({ conf.modkey, "Control" }, "c", function (c) c:kill() end),
-   awful.key({ conf.modkey, "Control" }, "space", awful.client.floating.toggle),
-   awful.key({ conf.modkey, "Control" }, "Return",
-             function (c) c:swap(awful.client.getmaster()) end),
-   awful.key({ conf.modkey, "Control" }, "o", awful.client.movetoscreen),
-   awful.key({ conf.modkey, "Control" }, "r", function (c) c:redraw() end),
-   awful.key({ conf.modkey, "Control" }, "*", awful.client.togglemarked),
+   keydoc.group("Window-specific bindings"),
+   awful.key({ conf.modkey, "Control" }, "f", function (c) c.fullscreen = not c.fullscreen end,
+             'Fullscreen'),
+   awful.key({ conf.modkey, "Control" }, "c", function (c) c:kill() end,
+             'Kill'),
+   awful.key({ conf.modkey, "Control" }, "space", awful.client.floating.toggle,
+             'Toggle floating'),
+   awful.key({ conf.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end,
+             'Switch with master window'),
+   awful.key({ conf.modkey, "Control" }, "o", awful.client.movetoscreen,
+             'Move to next screen'),
+   awful.key({ conf.modkey, "Control" }, "r", function (c) c:redraw() end,
+             'Redraw'),
+   awful.key({ conf.modkey, "Control" }, "*", awful.client.togglemarked,
+             'Toggle mark'),
    awful.key({ conf.modkey, "Control" }, "m",
              function (c)
                 c.maximized_horizontal = not c.maximized_horizontal
@@ -278,7 +297,8 @@ conf.bindings.client = awful.util.table.join(
                 else
                    c.border_color = beautiful.border_focus
                 end
-             end),
+             end,
+             'Maximise'),
 
    -- opacity
    awful.key({ conf.modkey, }, "Prior",
