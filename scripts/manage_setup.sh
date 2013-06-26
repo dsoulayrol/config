@@ -17,9 +17,9 @@ DATA_HOME=`[ -n "$XDG_DATA_HOME" ] && echo $XDG_DATA_HOME || echo $HOME/.local/s
 BOLD="\033[1m"
 NORM="\033[0m"
 
-[ -n "$CONFIG_SERVER" ] || trap_error "no server"
-[ -e "$CONFIG_HOME" ] || trap_error "configuration directory does not exist"
-[ -e "$DATA_HOME" ] || trap_error "data directory does not exist"
+[ -n "$CONFIG_SERVER" ] || ds_trap_error "no server"
+[ -e "$CONFIG_HOME" ] || ds_trap_error "configuration directory does not exist"
+[ -e "$DATA_HOME" ] || ds_trap_error "data directory does not exist"
 
 SYNC_CONTENT=""
 
@@ -76,7 +76,7 @@ while getopts "siuhm:pP" o; do
             SYNC_CONTENT="sync_data;"$SYNC_CONTENT;;
         u)  SYNC_CONTENT=$SYNC_CONTENT"update_local_data;";;
 	[?])
-            trap_usage "[-s] [-i] [-h]";;
+            ds_trap_usage "[-s] [-i] [-h]";;
     esac
 done
 

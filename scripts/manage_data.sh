@@ -125,7 +125,7 @@ merge = Name \* -> diff3 -m CURRENT1 CURRENTARCH CURRENT2 > NEW || echo ' \*\* U
 
 check_params() {
     if [ $# -gt 2 ]; then
-        trap_error "wrong arguments. try manage_data.sh help"
+        ds_trap_error "wrong arguments. try manage_data.sh help"
     fi
     if [ $# -gt 1 ]; then
         NAME="$2"
@@ -134,13 +134,13 @@ check_params() {
 
 check_no_params() {
     if [ $# -gt 1 ]; then
-        trap_error "wrong arguments. try manage_date.sh help"
+        ds_trap_error "wrong arguments. try manage_date.sh help"
     fi
 }
 
 check_server() {
     if [ -z "$CONFIG_SERVER" ]; then
-        trap_error "no server"
+        ds_trap_error "no server"
     fi
 }
 
@@ -168,15 +168,15 @@ get_installed_name() {
     echo $HOME/`basename $p | tr '!' '/'`
 }
 
-[ -e "$DATA_HOME" ] || trap_error "data directory does not exist"
-[ -x "$UNISON" ] || trap_error "unison not in path"
+[ -e "$DATA_HOME" ] || ds_trap_error "data directory does not exist"
+[ -x "$UNISON" ] || ds_trap_error "unison not in path"
 
 case "$1" in
     add)
         check_params $*
         check_profile
         if [[ "`readlink -f $NAME`" =~ "$DATA_ROOT" ]]; then
-            trap_error "$NAME is already shared"
+            ds_trap_error "$NAME is already shared"
         fi
         SHARED_PATH=$DATA_ROOT/`get_shared_name $NAME`
         mv $NAME $SHARED_PATH
@@ -194,7 +194,7 @@ case "$1" in
                 exit 0
             fi
         fi
-        trap_error "$NAME is not shared"
+        ds_trap_error "$NAME is not shared"
         ;;
     sync)
         check_no_params
@@ -211,11 +211,11 @@ case "$1" in
         check_params $*
         check_profile
         if [[ ! "`readlink -f $NAME`" =~ "$DATA_ROOT" ]]; then
-            trap_error "$NAME is not shared"
+            ds_trap_error "$NAME is not shared"
         fi
         INSTALLED_PATH=`get_installed_name $NAME`
         if [ -e "$INSTALLED_PATH" ]; then
-            trap_error "$INSTALLED_PATH already exists"
+            ds_trap_error "$INSTALLED_PATH already exists"
         fi
         ln -s `readlink -f $NAME` $INSTALLED_PATH
         echo "installed $INSTALLED_PATH"

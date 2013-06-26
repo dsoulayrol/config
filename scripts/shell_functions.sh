@@ -1,7 +1,7 @@
 # This script should be sourced by .bashrc or equivalent.
 
-# make use of both CPU when compiling.
-export MAKEFLAGS="-j`ls -1 /sys/devices/system/cpu/cpu* | wc -l`"
+# optimize the use of CPU when compiling.
+export MAKEFLAGS="-j`ls -1d /sys/devices/system/cpu/cpu? | wc -l`"
 
 # dh_make environment.
 export DEBEMAIL=david.soulayrol@gmail.com
@@ -18,12 +18,12 @@ fi
 export PATH
 
 # generic way of reporting errors for configuration scripts
-trap_error() {
+ds_trap_error() {
     echo `basename $0`": error: $1"
     exit 1
 }
 
-trap_usage() {
+ds_trap_usage() {
     echo "usage: "`basename $0`" $1"
     exit 1
 }

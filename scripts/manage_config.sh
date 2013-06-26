@@ -183,7 +183,7 @@ RSYNC_OPT="-ctur"
 
 check_params() {
     if [ $# -gt 2 ]; then
-        trap_error "wrong arguments. try manage_config.sh help"
+        ds_trap_error "wrong arguments. try manage_config.sh help"
     fi
     if [ $# -gt 1 ]; then
         NAME="$2"
@@ -192,13 +192,13 @@ check_params() {
 
 check_no_params() {
     if [ $# -gt 1 ]; then
-        trap_error "wrong arguments. try manage_config.sh help"
+        ds_trap_error "wrong arguments. try manage_config.sh help"
     fi
 }
 
 check_server() {
     if [ -z "$CONFIG_SERVER" ]; then
-        trap_error "no server"
+        ds_trap_error "no server"
     fi
 }
 
@@ -230,8 +230,8 @@ hide_local_files() {
     fi
 }
 
-[ -e "$CONFIG_HOME" ] || trap_error "configuration directory does not exist"
-[ -x "$RSYNC" ] || trap_error "rsync not in path"
+[ -e "$CONFIG_HOME" ] || ds_trap_error "configuration directory does not exist"
+[ -x "$RSYNC" ] || ds_trap_error "rsync not in path"
 
 case "$1" in
     fetch)
@@ -321,7 +321,7 @@ case "$1" in
         cat $0 | sed '1,2d;/# EOD/Q;s/^# //g' | man -l -
         ;;
     *)
-        trap_error "wrong arguments. try manage_config.sh help"
+        ds_trap_error "wrong arguments. try manage_config.sh help"
         ;;
 esac
 
