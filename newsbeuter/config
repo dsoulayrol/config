@@ -1,0 +1,44 @@
+urls-source "opml"
+opml-url "http://david.soulayrol.name/feeds.xml"
+
+#datetime-format %b %d
+feedlist-format "%n %S %11u %t"
+#articlelist-format "%f %D   %?T?|%-17T|  ?%t"
+
+auto-reload yes
+suppress-first-reload yes
+reload-only-visible-feeds no
+reload-time 120
+
+refresh-on-startup no
+cleanup-on-quit no
+confirm-exit yes
+
+save-path ~/
+
+display-article-progress yes
+
+error-log ~/.local/share/newsbeuter/errors
+
+goto-next-feed no
+
+html-renderer internal
+
+max-items 0
+
+# notify-format "newsbeuter: finished reload, %f unread feeds (%n unread articles total)"
+# notify-program ""
+# notify-screen no
+# notify-xterm no
+# notify-beep no
+
+show-keymap-hint yes
+
+show-read-feeds yes
+show-read-articles no
+
+text-width 80
+
+highlight article "^(Fil|Titre|Auteur|Lien|Date):" default default bold
+
+macro v pipe-to ~/.config/scripts/view_news_article_images.awk
