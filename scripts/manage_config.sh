@@ -318,7 +318,7 @@ case "$1" in
         fi
         ;;
     help)
-        cat $0 | sed '1,2d;/# EOD/Q;s/^# //g' | man -l -
+        ds_display_help
         ;;
     *)
         ds_trap_error "wrong arguments. try manage_config.sh help"

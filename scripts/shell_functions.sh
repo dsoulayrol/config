@@ -3,10 +3,6 @@
 # optimize the use of CPU when compiling.
 export MAKEFLAGS="-j`ls -1d /sys/devices/system/cpu/cpu? | wc -l`"
 
-# dh_make environment.
-export DEBEMAIL=david.soulayrol@gmail.com
-export DEBFULLNAME="David Soulayrol"
-
 # Personal environment.
 export TERM=linux
 export EDITOR="emacsclient -c -a emacs"
@@ -26,6 +22,10 @@ ds_trap_error() {
 ds_trap_usage() {
     echo "usage: "`basename $0`" $1"
     exit 1
+}
+
+ds_display_help() {
+    cat $0 | sed '1,2d;/# EOD/Q;s/^# //g' | man -l -
 }
 
 # open mutt on a mairix search results
